@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hải Anh - Free Fire Tool</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+body {
+    background: #0a0a0f;
+    color: #fff;
+    min-height: 100vh;
+}
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #1a1a2e; }
+::-webkit-scrollbar-thumb { background: #ff6600; border-radius: 4px; }
+
+/* ===== NAVBAR ===== */
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    background: rgba(10, 10, 15, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 102, 0, 0.3);
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 65px;
+}
+
+.nav-logo {
+    font-size: 24px;
+    font-weight: 900;
+    color: #ff6600;
+    text-shadow: 0 0 20px rgba(255, 102, 0, 0.5);
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.nav-logo span {
+    color: #fff;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    list-style: none;
+}
+
+.nav-links a {
+    color: #ccc;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.nav-links a:hover {
+    background: rgba(255, 102, 0, 0.15);
+    color: #ff6600;
+}
+
+.nav-links a.active {
+    background: rgba(255, 102, 0, 0.2);
+    color: #ff6600;
+}
+
+.nav-auth {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-auth {
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-login {
+    background: transparent;
+    color: #ff6600;
+    border: 1px solid #ff6600;
+}
+
+.btn-login:hover {
+    background: rgba(255, 102, 0, 0.15);
+}
+
+.btn-register {
+    background: linear-gradient(135deg, #ff6600, #ff3300);
+    color: #fff;
+}
+
+.btn-register:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(255, 102, 0, 0.4);
+}
+
+.hamburger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    gap: 5px;
+    background: none;
+    border: none;
+    padding: 5px;
+}
+
+.hamburger span {
+    width: 25px;
+    height: 3px;
+    background: #ff6600;
+    border-radius: 3px;
+    transition: 0.3s;
+}
+
+/* ===== HERO ===== */
+.hero {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(135deg, #0a0a0f 0%, #1a0a00 50%, #0a0a0f 100%);
+    position: relative;
+    overflow: hidden;
+    padding: 0 20px;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 102, 0, 0.05) 0%, transparent 70%);
+    animation: heroGlow 8s ease-in-out infinite;
+}
+
+@keyframes heroGlow {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(5%, 5%); }
+}
+
+.hero-logo {
+    font-size: 64px;
+    font-weight: 900;
+    color: #ff6600;
+    text-shadow: 0 0 40px rgba(255, 102, 0, 0.3), 0 0 80px rgba(255, 102, 0, 0.1);
+    z-index: 1;
+}
+
+.hero-logo span {
+    color: #fff;
+}
+
+.hero-sub {
+    font-size: 18px;
+    color: #888;
+    margin-top: 15px;
+    z-index: 1;
+}
+
+.hero-btn {
+    margin-top: 30px;
+    padding: 14px 40px;
+    background: linear-gradient(135deg, #ff6600, #ff3300);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    z-index: 1;
+    text-decoration: none;
+}
+
+.hero-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 40px rgba(255, 102, 0, 0.4);
+}
+
+/* ===== SECTION ===== */
+.section {
+    padding: 80px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 36px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    color: #ff6600;
+    text-shadow: 0 0 20px rgba(255, 102, 0, 0.3);
+}
+
+.section-desc {
+    text-align: center;
+    color: #888;
+    font-size: 16px;
+    margin-bottom: 50px;
+}
+
+/* ===== UID LOOKUP ===== */
+.uid-card {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border: 1px solid rgba(255, 102, 0, 0.2);
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 600px;
+    margin: 0 auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.uid-input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.uid-input {
+    flex: 1;
+    padding: 16px 20px;
+    border: 2px solid rgba(255, 102, 0, 0.3);
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.3);
+    color: #fff;
+    font-size: 18px;
+    outline: none;
+    transition: all 0.3s;
+}
+
+.uid-input:focus {
+    border-color: #ff6600;
+    box-shadow: 0 0 20px rgba(255, 102, 0, 0.2);
+}
+
+.uid-input::placeholder {
+    color: #666;
+}
+
+.btn-check {
+    padding: 16px 30px;
+    background: linear-gradient(135deg, #ff6600, #ff3300);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+
+.btn-check:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(255, 102, 0, 0.4);
+}
+
+.btn-check:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ===== CHARACTER INFO ===== */
+.char-info {
+    margin-top: 30px;
+    display: none;
+    animation: fadeIn 0.5s ease;
+}
+
+.char-info.show {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.char-card {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border: 1px solid rgba(255, 102, 0, 0.2);
+    border-radius: 20px;
+    padding: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.char-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #ff6600, #ff3300, #ff6600);
+}
+
+.char-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.char-avatar {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff6600, #ff3300);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    flex-shrink: 0;
+}
+
+.char-name {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.char-uid {
+    color: #888;
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+.char-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.stat-item {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.stat-icon.level { background: rgba(0, 200, 83, 0.2); }
+.stat-icon.likes { background: rgba(255, 102, 0, 0.2); }
+.stat-icon.guild { background: rgba(100, 100, 255, 0.2); }
+.stat-icon.region { background: rgba(255, 200, 0, 0.2); }
+
+.stat-label {
+    font-size: 12px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.stat-value {
+    font-size: 18px;
+    font-weight: 700;
+    margin-top: 2px;
+}
+
+/* ===== LOADING ===== */
+.loading-spinner {
+    display: none;
+    text-align: center;
+    padding: 30px;
+}
+
+.loading-spinner.show {
+    display: block;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255, 102, 0, 0.2);
+    border-top-color: #ff6600;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-text {
+    color: #888;
+    font-size: 14px;
+}
+
+/* ===== BOT RESULT ===== */
+.bot-result {
+    display: none;
+    margin-top: 30px;
+    animation: fadeIn 0.5s ease;
+}
+
+.bot-result.show {
+    display: block;
+}
+
+.bot-card {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    border-radius: 20px;
+    padding: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.bot-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #4caf50, #8bc34a, #4caf50);
+}
+
+.bot-success {
+    text-align: center;
+    font-size: 24px;
+    font-weight: 700;
+    color: #4caf50;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.bot-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.bot-info-item {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.bot-info-item .label {
+    color: #888;
+    font-size: 13px;
+}
+
+.bot-info-item .value {
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.bot-info-item .value.green { color: #4caf50; }
+.bot-info-item .value.orange { color: #ff6600; }
+.bot-info-item .value.blue { color: #64b5f6; }
+
+/* ===== ERROR ===== */
+.error-msg {
+    display: none;
+    text-align: center;
+    padding: 30px;
+    color: #ff5252;
+    font-weight: 600;
+}
+
+.error-msg.show {
+    display: block;
+}
+
+/* ===== MODAL ===== */
+.modal-overlay {
+    display:none;
+    position:fixed;
+    top:0;left:0;right:0;bottom:0;
+    background:rgba(0,0,0,0.7);
+    z-index:2000;
+    align-items:center;
+    justify-content:center;
+    animation:fadeIn 0.2s ease;
+}
+.modal-overlay.show { display:flex; }
+.modal-box {
+    background:linear-gradient(135deg,#1a1a2e,#16213e);
+    border:1px solid rgba(255,102,0,0.2);
+    border-radius:20px;
+    padding:30px;
+    width:450px;
+    max-width:92%;
+    max-height:90vh;
+    overflow-y:auto;
+    position:relative;
+    box-shadow:0 20px 60px rgba(0,0,0,0.6);
+}
+.modal-box::before {
+    content:'';
+    position:absolute;
+    top:0;left:0;right:0;
+    height:4px;
+    background:linear-gradient(90deg,#ff6600,#ff3300,#ff6600);
+}
+.modal-close {
+    position:absolute;
+    top:15px;right:18px;
+    background:none;
+    border:none;
+    color:#888;
+    font-size:24px;
+    cursor:pointer;
+    transition:color 0.3s;
+}
+.modal-close:hover { color:#ff6600; }
+.modal-title {
+    text-align:center;
+    font-size:22px;
+    font-weight:800;
+    color:#ff6600;
+    margin-bottom:5px;
+}
+.modal-sub {
+    text-align:center;
+    color:#888;
+    font-size:13px;
+    margin-bottom:25px;
+}
+.modal-presets {
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+    margin-bottom:20px;
+}
+.modal-preset-btn {
+    padding:14px 8px;
+    border:2px solid rgba(255,102,0,0.2);
+    border-radius:10px;
+    background:rgba(0,0,0,0.3);
+    color:#fff;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+    transition:all 0.3s;
+    text-align:center;
+}
+.modal-preset-btn:hover {
+    border-color:#ff6600;
+    background:rgba(255,102,0,0.1);
+    transform:translateY(-2px);
+}
+.modal-preset-btn.selected {
+    border-color:#ff6600;
+    background:rgba(255,102,0,0.2);
+    box-shadow:0 0 15px rgba(255,102,0,0.2);
+}
+.modal-divider {
+    text-align:center;
+    color:#555;
+    font-size:13px;
+    margin:15px 0;
+    position:relative;
+}
+.modal-divider::before,.modal-divider::after {
+    content:'';
+    position:absolute;
+    top:50%;
+    width:42%;
+    height:1px;
+    background:rgba(255,255,255,0.1);
+}
+.modal-divider::before { left:0; }
+.modal-divider::after { right:0; }
+/* ===== FOOTER ===== */
+.footer {
+    text-align: center;
+    padding: 30px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    color: #555;
+    font-size: 14px;
+    margin-top: 40px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .nav-links {
+        display: none;
+        position: absolute;
+        top: 65px;
+        left: 0;
+        width: 100%;
+        background: rgba(10, 10, 15, 0.98);
+        flex-direction: column;
+        padding: 15px;
+        border-bottom: 1px solid rgba(255, 102, 0, 0.2);
+    }
+
+    .nav-links.open {
+        display: flex;
+    }
+
+    .nav-links a {
+        width: 100%;
+        padding: 12px 16px;
+    }
+
+    .nav-auth {
+        width: 100%;
+        flex-direction: column;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .hamburger {
+        display: flex;
+    }
+
+    .hero-logo {
+        font-size: 40px;
+    }
+
+    .section-title {
+        font-size: 28px;
+    }
+
+    .uid-input-group {
+        flex-direction: column;
+    }
+
+    .char-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .bot-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .char-header {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar" id="navbar">
+    <a href="/home" class="nav-logo">HẢI ANH <span>FF</span></a>
+    <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+        <li><a href="/home" class="active" onclick="closeMenu()">🔍 Trang chủ</a></li>
+        <li><a href="/dashboard.html" onclick="closeMenu()">🤖 Trợ lý AI</a></li>
+        <li><a onclick="showHistory();closeMenu()" style="cursor:pointer;">📜 Lịch sử</a></li>
+        <div class="nav-auth" id="navAuth">
+            <a class="btn-auth btn-login" onclick="showTopUp()" style="background:linear-gradient(135deg,#ff6600,#ff3300);color:#fff;padding:8px 16px;border-radius:8px;cursor:pointer;font-weight:600;font-size:13px;">💰 Nạp tiền</a>
+            <span id="navBalance" style="color:#4caf50;font-weight:700;font-size:14px;margin:0 4px;">💰 0đ</span>
+            <span class="btn-auth" id="userInfo" style="display:none;font-size:13px;cursor:pointer;" onclick="showUserInfo()"></span>
+            <a href="/" class="btn-auth btn-login" id="btnLogout" onclick="logout()">🚪 Thoát</a>
+        </div>
+    </ul>
+</nav>
+
+<!-- ===== UID LOOKUP SECTION ===== -->
+<section class="section" id="lookup">
+    <h2 class="section-title">🔍 Tra cứu UID Free Fire</h2>
+    <p class="section-desc">Nhập UID Garena để tra cứu thông tin nhân vật</p>
+
+    <div class="uid-card">
+        <div class="uid-input-group">
+            <input type="text" class="uid-input" id="uidInput" placeholder="Nhập UID Free Fire..." maxlength="12" onkeydown="if(event.key==='Enter') lookupUID()">
+            <button class="btn-check" id="btnCheck" onclick="lookupUID()">📊 Kiểm tra</button>
+        </div>
+
+        <div class="loading-spinner" id="loadingSpinner">
+            <div class="spinner"></div>
+            <div class="loading-text">🔄 Đang tra cứu thông tin...</div>
+        </div>
+
+        <div class="error-msg" id="errorMsg">⚠️ Không tìm thấy thông tin cho UID này</div>
+
+        <!-- ===== CHARACTER INFO ===== -->
+        <div class="char-info" id="charInfo">
+            <div class="char-card">
+                <div class="char-header">
+                    <div class="char-avatar">👤</div>
+                    <div>
+                        <div class="char-name" id="charName">--</div>
+                        <div class="char-uid" id="charUID">UID: --</div>
+                    </div>
+                </div>
+                <div class="char-stats">
+                    <div class="stat-item">
+                        <div class="stat-icon level">⭐</div>
+                        <div>
+                            <div class="stat-label">Cấp độ</div>
+                            <div class="stat-value" id="charLevel">--</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon likes">👍</div>
+                        <div>
+                            <div class="stat-label">Lượt Like</div>
+                            <div class="stat-value" id="charLikes">--</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon guild">👥</div>
+                        <div>
+                            <div class="stat-label">Quân đoàn</div>
+                            <div class="stat-value" id="charGuild">--</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon region">🌍</div>
+                        <div>
+                            <div class="stat-label">Khu vực</div>
+                            <div class="stat-value" id="charRegion">VN</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== BOT RESULT ===== -->
+        <div class="bot-result" id="botResult">
+            <div class="bot-card">
+                <div class="bot-success">✅ Thông tin tài khoản</div>
+                <div class="bot-info-grid">
+                    <div class="bot-info-item">
+                        <span class="label">👤 Tên người chơi</span>
+                        <span class="value orange" id="botName">--</span>
+                    </div>
+                    <div class="bot-info-item">
+                        <span class="label">🆔 UID</span>
+                        <span class="value" id="botUID">--</span>
+                    </div>
+                    <div class="bot-info-item">
+                        <span class="label">🌍 Khu vực</span>
+                        <span class="value blue" id="botRegion">VN</span>
+                    </div>
+                    <div class="bot-info-item">
+                        <span class="label">⭐ Cấp độ</span>
+                        <span class="value" id="botLevel">--</span>
+                    </div>
+                    <div class="bot-info-item">
+                        <span class="label">📅 Ngày tạo acc</span>
+                        <span class="value" id="botCreated">--</span>
+                    </div>
+                    <div class="bot-info-item">
+                        <span class="label">🕐 Lần cuối đăng nhập</span>
+                        <span class="value blue" id="botLastLogin">--</span>
+                    </div>
+                    <div class="bot-info-item" style="grid-column: 1 / -1;">
+                        <span class="label">👨‍💻 Người tạo web</span>
+                        <span class="value orange" id="botCreator">Hải Anh</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+<!-- ===== HISTORY MODAL ===== -->
+<div class="modal-overlay" id="historyModal" onclick="if(event.target===this)closeHistory()">
+    <div class="modal-box" style="width:550px;">
+        <button class="modal-close" onclick="closeHistory()">✕</button>
+        <div class="modal-title">📜 Lịch sử giao dịch</div>
+        <div class="modal-sub">Các giao dịch nạp tiền và mua hàng gần đây</div>
+        <div id="historyList" style="max-height:400px;overflow-y:auto;">
+            <div style="text-align:center;color:#888;padding:30px;font-size:14px;" id="historyEmpty">⏳ Đang tải...</div>
+        </div>
+        <div id="historyPayment" style="display:none;margin-top:15px;padding:20px;background:rgba(0,0,0,0.3);border-radius:12px;text-align:center;">
+            <div style="font-size:16px;font-weight:700;color:#4caf50;margin-bottom:10px;">💳 Thanh toán</div>
+            <div style="margin-bottom:8px;"><span style="color:#888;">Mã:</span> <span style="color:#ff6600;font-weight:700;letter-spacing:1px;" id="hpayCode">--</span></div>
+            <div style="margin-bottom:8px;"><span style="color:#888;">Tiền:</span> <span style="color:#4caf50;font-weight:700;" id="hpayPrice">--</span></div>
+            <div style="background:#fff;border-radius:12px;padding:10px;display:inline-block;margin:10px 0;">
+                <img id="hpayQr" src="" alt="QR" style="width:200px;height:200px;display:block;">
+            </div>
+            <div style="font-size:20px;font-weight:700;color:#ff6600;">Vietcombank - 1064516147</div>
+            <div style="font-size:16px;color:#ccc;margin:5px 0;">NGUYEN HAI ANH</div>
+            <div style="font-size:13px;color:#888;margin-top:10px;padding:10px;background:rgba(255,102,0,0.1);border-radius:8px;">
+                📝 ND CK: <span style="color:#ff6600;font-weight:700;letter-spacing:1px;" id="hpayRef">--</span>
+            </div>
+            <button onclick="closeHistoryPayment()" style="margin-top:12px;background:none;border:1px solid #888;color:#888;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:13px;">✕ Đóng</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== USER INFO MODAL ===== -->
+<div class="modal-overlay" id="userModal" onclick="if(event.target===this)closeUserInfo()">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeUserInfo()">✕</button>
+        <div class="modal-title">👤 Thông tin tài khoản</div>
+        <div class="modal-sub">Quản lý thông tin cá nhân</div>
+
+        <div style="background:rgba(0,0,0,0.3);border-radius:12px;padding:20px;margin-bottom:15px;">
+            <div style="margin-bottom:12px;">
+                <div style="color:#888;font-size:12px;">Email</div>
+                <div style="color:#fff;font-weight:600;" id="uEmail">--</div>
+            </div>
+            <div style="margin-bottom:12px;">
+                <div style="color:#888;font-size:12px;">Tên hiển thị</div>
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <input type="text" id="uDisplayName" style="flex:1;padding:8px 12px;border:2px solid rgba(255,102,0,0.15);border-radius:8px;background:rgba(0,0,0,0.3);color:#fff;font-size:14px;outline:none;">
+                    <button class="btn-check" onclick="saveDisplayName()" style="padding:8px 16px;font-size:13px;">Lưu</button>
+                </div>
+                <div id="uNameError" style="color:#ff5252;font-size:12px;margin-top:4px;display:none;"></div>
+            </div>
+            <div style="margin-bottom:12px;">
+                <div style="color:#888;font-size:12px;">Số dư</div>
+                <div style="color:#4caf50;font-weight:700;font-size:18px;" id="uBalance">0đ</div>
+            </div>
+            <div style="margin-bottom:12px;">
+                <div style="color:#888;font-size:12px;">Ngày đăng ký</div>
+                <div style="color:#ccc;" id="uCreated">--</div>
+            </div>
+            <div>
+                <div style="color:#888;font-size:12px;">Mật khẩu</div>
+                <button class="btn-check" onclick="showChangePass()" style="padding:8px 16px;font-size:13px;margin-top:4px;">🔑 Đổi mật khẩu</button>
+            </div>
+        </div>
+
+        <div id="changePassSection" style="display:none;">
+            <div class="modal-divider">ĐỔI MẬT KHẨU</div>
+            <div class="input-group">
+                <label style="color:#888;font-size:13px;">Mật khẩu hiện tại</label>
+                <input type="password" id="oldPass" style="width:100%;padding:10px 14px;border:2px solid rgba(255,102,0,0.15);border-radius:8px;background:rgba(0,0,0,0.3);color:#fff;font-size:14px;outline:none;margin-top:4px;">
+            </div>
+            <div class="input-group" style="margin-top:10px;">
+                <label style="color:#888;font-size:13px;">Mật khẩu mới</label>
+                <input type="password" id="newPass" style="width:100%;padding:10px 14px;border:2px solid rgba(255,102,0,0.15);border-radius:8px;background:rgba(0,0,0,0.3);color:#fff;font-size:14px;outline:none;margin-top:4px;">
+            </div>
+            <button class="btn-primary" onclick="changePassword()" style="margin-top:10px;">💾 Cập nhật</button>
+            <div id="passMsg" style="font-size:13px;margin-top:8px;text-align:center;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== TOP-UP MODAL ===== -->
+<div class="modal-overlay" id="topupModal" onclick="if(event.target===this)closeTopUp()">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeTopUp()">✕</button>
+        <div class="modal-title">💰 Nạp tiền</div>
+        <div class="modal-sub">Chọn số tiền hoặc nhập số tiền tùy ý</div>
+
+        <div class="modal-presets" id="topupPresets">
+            <button class="modal-preset-btn" data-amount="10000" onclick="selectTopupAmount(this)">10.000đ</button>
+            <button class="modal-preset-btn" data-amount="20000" onclick="selectTopupAmount(this)">20.000đ</button>
+            <button class="modal-preset-btn" data-amount="30000" onclick="selectTopupAmount(this)">30.000đ</button>
+            <button class="modal-preset-btn" data-amount="50000" onclick="selectTopupAmount(this)">50.000đ</button>
+            <button class="modal-preset-btn" data-amount="100000" onclick="selectTopupAmount(this)">100.000đ</button>
+            <button class="modal-preset-btn" data-amount="200000" onclick="selectTopupAmount(this)">200.000đ</button>
+            <button class="modal-preset-btn" data-amount="300000" onclick="selectTopupAmount(this)">300.000đ</button>
+            <button class="modal-preset-btn" data-amount="1000000" onclick="selectTopupAmount(this)">1.000.000đ</button>
+        </div>
+
+        <div class="modal-divider">HOẶC NHẬP SỐ TIỀN</div>
+
+        <div class="uid-input-group" style="margin-bottom:15px;">
+            <input type="number" class="uid-input" id="topupAmount" placeholder="Nhập số tiền (VNĐ)..." min="1000" oninput="clearTopupPresets()">
+        </div>
+
+        <button class="btn-check" id="btnTopup" onclick="submitTopUp()" style="width:100%;justify-content:center;">💳 Nạp tiền</button>
+
+        <div class="loading-spinner" id="topupSpinner">
+            <div class="spinner"></div>
+            <div class="loading-text">🔄 Đang xử lý...</div>
+        </div>
+
+        <div class="error-msg" id="topupError"></div>
+
+        <div id="topupResult" style="display:none;margin-top:20px;padding:20px;background:rgba(0,0,0,0.3);border-radius:12px;text-align:center;">
+            <div style="font-size:18px;font-weight:700;color:#4caf50;margin-bottom:15px;">✅ Yêu cầu nạp tiền thành công</div>
+            <div style="margin-bottom:10px;">
+                <span style="color:#888;">Mã giao dịch:</span>
+                <span style="color:#ff6600;font-weight:700;font-size:18px;letter-spacing:1px;" id="topupCode">--</span>
+            </div>
+            <div style="margin-bottom:10px;">
+                <span style="color:#888;">Số tiền:</span>
+                <span style="color:#4caf50;font-weight:700;font-size:18px;" id="topupPrice">--</span>
+            </div>
+            <div style="margin-bottom:10px;">
+                <span style="color:#ff6600;font-weight:700;font-size:14px;" id="topupTimer">⏱ Mã QR hết hạn sau: 10:00</span>
+            </div>
+            <div style="background:#fff;border-radius:12px;padding:10px;display:inline-block;margin:10px 0;">
+                <img id="topupQr" src="" alt="QR" style="width:200px;height:200px;display:block;">
+            </div>
+            <div style="font-size:20px;font-weight:700;color:#ff6600;">Vietcombank - 1064516147</div>
+            <div style="font-size:16px;color:#ccc;margin:5px 0;">NGUYEN HAI ANH</div>
+            <div style="font-size:13px;color:#888;margin-top:10px;padding:10px;background:rgba(255,102,0,0.1);border-radius:8px;">
+                📝 Nội dung CK: <span style="color:#ff6600;font-weight:700;letter-spacing:1px;" id="topupCodeRef">--</span>
+            </div>
+            <div style="margin-top:10px;display:none;" id="topupExpired">
+                <div style="color:#ff5252;font-size:14px;font-weight:600;margin-bottom:8px;">⚠️ Mã QR đã hết hạn</div>
+                <button class="btn-check" onclick="submitTopUp()" style="width:100%;justify-content:center;">🔄 Tạo mã QR mới</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<div class="footer">
+    © 2026 HẢI ANH FF - Công cụ tra cứu Free Fire
+</div>
+
+<script>window.__orders = {{ orders_json | safe }};</script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+import { getAuth, signOut, onAuthStateChanged, EmailAuthProvider, updatePassword, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB8GsUB1Rm5d7x--_4b9Ch8J1tr4PQwlZM",
+  authDomain: "haianh-web.firebaseapp.com",
+  projectId: "haianh-web",
+  storageBucket: "haianh-web.firebasestorage.app",
+  messagingSenderId: "501490561221",
+  appId: "1:501490561221:web:16c7333c43a67cae4080ac"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+let currentUserEmail = '';
+function updateUserInfo() {
+    const el = document.getElementById('userInfo');
+    const balEl = document.getElementById('navBalance');
+    if (!el) return;
+    if (!currentUserEmail) { el.style.display = 'none'; if (balEl) balEl.textContent = '💰 0đ'; return; }
+    Promise.all([
+        fetch('/api/balance?email=' + encodeURIComponent(currentUserEmail)).then(r => r.json()),
+        fetch('/api/get-name?email=' + encodeURIComponent(currentUserEmail)).then(r => r.json())
+    ])
+    .then(([balData, nameData]) => {
+        const displayName = nameData.name || currentUserEmail.split('@')[0];
+        const bal = (balData.balance || 0);
+        el.innerHTML = '<span style="color:#ff6600;">👤 ' + displayName + '</span> &nbsp;|&nbsp; <span style="color:#4caf50;font-weight:700;">💰 ' + bal.toLocaleString() + 'đ</span>';
+        el.style.display = 'inline';
+        if (balEl) balEl.textContent = '💰 ' + bal.toLocaleString() + 'đ';
+    })
+    .catch(() => {
+        el.innerHTML = '👤 ' + currentUserEmail.split('@')[0];
+        el.style.display = 'inline';
+        if (balEl) balEl.textContent = '💰 0đ';
+    });
+}
+
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        window.location.href = '/';
+        return;
+    }
+    currentUserEmail = user.email;
+    const infoEl = document.getElementById('userInfo');
+    if (infoEl) {
+        infoEl.style.display = 'inline';
+        updateUserInfo();
+    }
+});
+
+window.logout = function() {
+    signOut(auth).then(() => {
+        window.location.href = '/';
+    });
+};
+
+// ===== MOBILE MENU =====
+window.toggleMenu = function() {
+    document.getElementById('navLinks').classList.toggle('open');
+};
+window.closeMenu = function() {
+    document.getElementById('navLinks').classList.remove('open');
+};
+
+window.addEventListener('scroll', () => {
+    document.getElementById('navLinks').classList.remove('open');
+});
+
+// ===== SMOOTH SCROLL =====
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+});
+
+// ===== FORMAT NUMBER =====
+function formatNumber(num) {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+// ===== LOOKUP UID VIA SERVER =====
+window.lookupUID = async function() {
+    const uid = document.getElementById('uidInput').value.trim();
+    const btn = document.getElementById('btnCheck');
+    const spinner = document.getElementById('loadingSpinner');
+    const charInfo = document.getElementById('charInfo');
+    const errorMsg = document.getElementById('errorMsg');
+    const botResult = document.getElementById('botResult');
+
+    if (!uid) {
+        alert('Vui lòng nhập UID Free Fire');
+        return;
+    }
+    if (uid.length < 6) {
+        alert('UID phải có ít nhất 6 ký tự');
+        return;
+    }
+
+    charInfo.classList.remove('show');
+    errorMsg.classList.remove('show');
+    botResult.classList.remove('show');
+    spinner.classList.add('show');
+    btn.disabled = true;
+
+    try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 25000);
+        const res = await fetch('/api/lookup?uid=' + encodeURIComponent(uid), { signal: controller.signal });
+        clearTimeout(timeout);
+        spinner.classList.remove('show');
+
+        let data;
+        try {
+            data = await res.json();
+        } catch {
+            errorMsg.textContent = '⚠️ Máy chủ phản hồi lỗi';
+            errorMsg.classList.add('show');
+            btn.disabled = false;
+            return;
+        }
+
+        if (!res.ok || data.error) {
+            errorMsg.textContent = '⚠️ ' + (data.error || 'Máy chủ phản hồi lỗi');
+            errorMsg.classList.add('show');
+            btn.disabled = false;
+            return;
+        }
+
+        const name = data.nickname || 'Không rõ';
+        const level = data.level || '?';
+        const likes = data.liked || 0;
+        const guild = data.guild || 'Không có';
+        const region = data.region || 'VN';
+
+        document.getElementById('charName').textContent = name;
+        document.getElementById('charUID').textContent = 'UID: ' + uid;
+        document.getElementById('charLevel').textContent = level;
+        document.getElementById('charLikes').textContent = formatNumber(likes);
+        document.getElementById('charGuild').textContent = guild;
+        document.getElementById('charRegion').textContent = region;
+        charInfo.classList.add('show');
+
+        setTimeout(() => {
+            function formatTime(ts) {
+                if (!ts || ts == 0) return 'Không rõ';
+                const d = new Date(parseInt(ts) * 1000);
+                const pad = n => n.toString().padStart(2, '0');
+                return pad(d.getDate()) + '/' + pad(d.getMonth()+1) + '/' + d.getFullYear() + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+            }
+
+            document.getElementById('botName').textContent = name;
+            document.getElementById('botUID').textContent = uid;
+            document.getElementById('botRegion').textContent = region;
+            document.getElementById('botLevel').textContent = level;
+            document.getElementById('botCreated').textContent = formatTime(data.createAt);
+            document.getElementById('botLastLogin').textContent = formatTime(data.lastLoginAt);
+            document.getElementById('botCreator').textContent = 'Hải Anh';
+
+            botResult.classList.add('show');
+            btn.disabled = false;
+        }, 800);
+    } catch (err) {
+        spinner.classList.remove('show');
+        errorMsg.textContent = '⚠️ ' + (err.name === 'AbortError' ? 'Máy chủ không phản hồi (quá thời gian)' : 'Lỗi kết nối máy chủ');
+        errorMsg.classList.add('show');
+        btn.disabled = false;
+    }
+}
+
+// ===== QR TIMER =====
+let qrTimers = {};
+
+function startQrTimer(id, timerId, expiredId) {
+    if (qrTimers[id]) clearInterval(qrTimers[id]);
+    const el = document.getElementById(timerId);
+    const exp = document.getElementById(expiredId);
+    let remaining = 600;
+    el.style.color = '#ff6600';
+    exp.style.display = 'none';
+    qrTimers[id] = setInterval(() => {
+        remaining--;
+        const m = Math.floor(remaining / 60);
+        const s = remaining % 60;
+        el.textContent = '⏱ Mã QR hết hạn sau: ' + m.toString().padStart(2,'0') + ':' + s.toString().padStart(2,'0');
+        if (remaining <= 60) el.style.color = '#ff5252';
+        if (remaining <= 0) {
+            clearInterval(qrTimers[id]);
+            el.textContent = '⏱ Mã QR đã hết hạn';
+            el.style.color = '#ff5252';
+            exp.style.display = 'block';
+        }
+    }, 1000);
+}
+
+// ===== USER INFO =====
+window.showUserInfo = async function() {
+    if (!currentUserEmail) { window.location.href = '/'; return; }
+    document.getElementById('userModal').classList.add('show');
+    document.getElementById('changePassSection').style.display = 'none';
+    document.getElementById('passMsg').textContent = '';
+    document.getElementById('uEmail').textContent = currentUserEmail || '--';
+    document.getElementById('uBalance').textContent = '💰 Đang tải...';
+
+    if (auth.currentUser) {
+        const created = auth.currentUser.metadata?.creationTime;
+        document.getElementById('uCreated').textContent = created ? new Date(created).toLocaleDateString('vi-VN') : '--';
+        document.getElementById('uDisplayName').value = auth.currentUser.displayName || '';
+    }
+
+    try {
+        const r = await fetch('/api/balance?email=' + encodeURIComponent(currentUserEmail));
+        const d = await r.json();
+        document.getElementById('uBalance').textContent = '💰 ' + (d.balance || 0).toLocaleString() + 'đ';
+    } catch {
+        document.getElementById('uBalance').textContent = '💰 0đ';
+    }
+    try {
+        const r = await fetch('/api/get-name?email=' + encodeURIComponent(currentUserEmail));
+        const d = await r.json();
+        if (d.name) document.getElementById('uDisplayName').value = d.name;
+    } catch {}
+};
+
+window.closeUserInfo = function() {
+    document.getElementById('userModal').classList.remove('show');
+};
+
+window.saveDisplayName = async function() {
+    const name = document.getElementById('uDisplayName').value.trim();
+    const errEl = document.getElementById('uNameError');
+    if (!name) { errEl.textContent = 'Vui lòng nhập tên'; errEl.style.display = 'block'; return; }
+    errEl.style.display = 'none';
+
+    try {
+        const r = await fetch('/api/set-name', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ email: currentUserEmail, name })
+        });
+        const d = await r.json();
+        if (!r.ok || d.error) {
+            errEl.textContent = '⚠️ ' + (d.error || 'Lỗi');
+            errEl.style.display = 'block';
+            return;
+        }
+        if (auth.currentUser) await auth.currentUser.updateProfile({ displayName: name });
+        errEl.textContent = '✅ Đã lưu!';
+        errEl.style.color = '#4caf50';
+        errEl.style.display = 'block';
+        setTimeout(() => { errEl.style.display = 'none'; errEl.style.color = '#ff5252'; }, 2000);
+    } catch {
+        errEl.textContent = '⚠️ Lỗi kết nối';
+        errEl.style.display = 'block';
+    }
+};
+
+window.showChangePass = function() {
+    const sec = document.getElementById('changePassSection');
+    sec.style.display = sec.style.display === 'none' ? 'block' : 'none';
+};
+
+window.changePassword = async function() {
+    const oldPass = document.getElementById('oldPass').value;
+    const newPass = document.getElementById('newPass').value;
+    const msg = document.getElementById('passMsg');
+    if (!oldPass || !newPass) { msg.textContent = '⚠️ Vui lòng nhập đủ mật khẩu'; msg.style.color = '#ff5252'; return; }
+    if (newPass.length < 6) { msg.textContent = '⚠️ Mật khẩu mới phải có ít nhất 6 ký tự'; msg.style.color = '#ff5252'; return; }
+
+    msg.textContent = '⏳ Đang xử lý...';
+    msg.style.color = '#888';
+
+    try {
+        const cred = EmailAuthProvider.credential(currentUserEmail, oldPass);
+        await reauthenticateWithCredential(auth.currentUser, cred);
+        await updatePassword(auth.currentUser, newPass);
+        msg.textContent = '✅ Đổi mật khẩu thành công!';
+        msg.style.color = '#4caf50';
+        document.getElementById('oldPass').value = '';
+        document.getElementById('newPass').value = '';
+    } catch (e) {
+        const code = e.code || '';
+        const msgs = {
+            'auth/wrong-password': 'Sai mật khẩu hiện tại',
+            'auth/invalid-credential': 'Sai mật khẩu hiện tại',
+            'auth/weak-password': 'Mật khẩu mới quá yếu'
+        };
+        msg.textContent = '⚠️ ' + (msgs[code] || 'Sai mật khẩu hiện tại');
+    }
+};
+
+// ===== TOP-UP =====
+let topupAmount = 0;
+
+window.showTopUp = function() {
+    if (!currentUserEmail) { alert('Vui lòng đăng nhập'); window.location.href='/'; return; }
+    document.getElementById('topupModal').classList.add('show');
+    document.getElementById('topupResult').style.display = 'none';
+    document.getElementById('topupError').classList.remove('show');
+    document.getElementById('topupSpinner').classList.remove('show');
+    document.getElementById('topupAmount').value = '';
+    topupAmount = 0;
+    document.querySelectorAll('.modal-preset-btn').forEach(b => b.classList.remove('selected'));
+};
+
+window.closeTopUp = function() {
+    document.getElementById('topupModal').classList.remove('show');
+};
+
+
+
+window.selectTopupAmount = function(el) {
+    document.querySelectorAll('.modal-preset-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    topupAmount = parseInt(el.dataset.amount);
+    document.getElementById('topupAmount').value = topupAmount.toLocaleString('vi-VN');
+};
+
+window.clearTopupPresets = function() {
+    document.querySelectorAll('.modal-preset-btn').forEach(b => b.classList.remove('selected'));
+    topupAmount = 0;
+};
+
+window.submitTopUp = async function() {
+    const customVal = parseInt(document.getElementById('topupAmount').value) || 0;
+    const amount = topupAmount > 0 ? topupAmount : customVal;
+    const errorMsg = document.getElementById('topupError');
+    const spinner = document.getElementById('topupSpinner');
+    const result = document.getElementById('topupResult');
+
+    if (amount < 1000) {
+        errorMsg.textContent = '⚠️ Vui lòng chọn hoặc nhập số tiền (tối thiểu 1.000đ)';
+        errorMsg.classList.add('show');
+        return;
+    }
+
+    errorMsg.classList.remove('show');
+    result.style.display = 'none';
+    spinner.classList.add('show');
+
+    try {
+        const res = await fetch('/api/order', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ uid: '000000', nickname: currentUserEmail || 'Nạp tiền', custom_price: amount, type: 'topup' })
+        });
+        spinner.classList.remove('show');
+        const data = await res.json();
+        if (!res.ok || data.error) {
+            errorMsg.textContent = '⚠️ ' + (data.error || 'Lỗi');
+            errorMsg.classList.add('show');
+            return;
+        }
+
+        document.getElementById('topupCode').textContent = data.order.code;
+        document.getElementById('topupCodeRef').textContent = data.order.code;
+        document.getElementById('topupPrice').textContent = data.order.price.toLocaleString() + 'đ';
+        const qrUrl = 'https://img.vietqr.io/image/VCB-1064516147-compact.png?amount=' + data.order.price + '&addInfo=' + encodeURIComponent(data.order.code) + '&accountName=NGUYEN%20HAI%20ANH';
+        document.getElementById('topupQr').src = qrUrl;
+        result.style.display = 'block';
+        startQrTimer('topup', 'topupTimer', 'topupExpired');
+        if (window.__orders) window.__orders.unshift(data.order);
+        const local = getLocalOrders();
+        local.unshift(data.order);
+        saveLocalOrders(local);
+        updateUserInfo();
+    } catch {
+        spinner.classList.remove('show');
+        errorMsg.textContent = '⚠️ Lỗi kết nối máy chủ';
+        errorMsg.classList.add('show');
+    }
+};
+
+// ===== HISTORY =====
+function getLocalOrders() {
+    try { return JSON.parse(localStorage.getItem('ff_orders') || '[]'); } catch { return []; }
+}
+function saveLocalOrders(orders) {
+    localStorage.setItem('ff_orders', JSON.stringify(orders));
+}
+// Merge server orders + local new orders
+function mergeOrders() {
+    const serverOrders = window.__orders || [];
+    const localOrders = getLocalOrders();
+    const allCodes = new Set();
+    const merged = [];
+    // Local first (newest)
+    localOrders.forEach(o => { if (!allCodes.has(o.code)) { allCodes.add(o.code); merged.push(o); } });
+    // Then server orders
+    serverOrders.forEach(o => { if (!allCodes.has(o.code)) { allCodes.add(o.code); merged.push(o); } });
+    return merged;
+}
+window.showHistory = function() {
+    if (!currentUserEmail) { alert('Vui lòng đăng nhập'); window.location.href='/'; return; }
+    document.getElementById('historyModal').classList.add('show');
+    const list = document.getElementById('historyList');
+    try {
+        const orders = mergeOrders();
+        if (orders.length === 0) {
+            list.innerHTML = '<div style="text-align:center;color:#888;padding:30px;font-size:14px;">📭 Chưa có giao dịch nào</div>';
+            return;
+        }
+        let html = `
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 0.5fr;gap:8px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:10px;font-size:12px;color:#888;text-transform:uppercase;letter-spacing:0.5px;">
+                <span>Mã GD / SP</span>
+                <span>Tiền</span>
+                <span>TT</span>
+                <span>TGian</span>
+                <span>Loại</span>
+            </div>
+        `;
+        orders.forEach(o => {
+            const statusColor = o.status === 'Chờ thanh toán' ? '#ff6600' : o.status === 'Thất bại' ? '#ff5252' : '#4caf50';
+            const statusIcon = o.status === 'Chờ thanh toán' ? '⏳' : o.status === 'Thất bại' ? '❌' : '✅';
+            const type = o.type === 'topup' ? '💰 Nạp' : o.type === 'like' || !o.type ? '👍 Like' : '📦 Hàng';
+            const payBtn = o.status === 'Chờ thanh toán' ? `<button onclick="resumePayment('${o.code}')" style="background:none;border:1px solid #ff6600;color:#ff6600;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;margin-top:4px;">💳 TT</button>` : '';
+            html += `
+                <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 0.5fr;gap:8px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);align-items:center;font-size:13px;">
+                    <div>
+                        <div style="font-weight:700;color:#ff6600;letter-spacing:1px;font-size:12px;">${o.code}</div>
+                        <div style="color:#888;font-size:11px;">${o.package}</div>
+                        ${payBtn}
+                    </div>
+                    <div style="font-weight:700;color:#4caf50;">${parseInt(o.price).toLocaleString()}đ</div>
+                    <div style="color:${statusColor};font-size:12px;">${statusIcon} ${o.status}</div>
+                    <div style="color:#888;font-size:11px;">${o.created_at}</div>
+                    <div style="font-size:11px;color:#ff6600;">${type}</div>
+                </div>
+            `;
+        });
+        list.innerHTML = html;
+    } catch {
+        list.innerHTML = '<div style="text-align:center;color:#ff5252;padding:30px;font-size:14px;">⚠️ Lỗi tải lịch sử</div>';
+    }
+};
+
+window.closeHistory = function() {
+    document.getElementById('historyModal').classList.remove('show');
+    document.getElementById('historyPayment').style.display = 'none';
+};
+
+window.resumePayment = function(code) {
+    const allOrders = mergeOrders();
+    const order = allOrders.find(o => o.code === code);
+    if (!order) return;
+    document.getElementById('historyPayment').style.display = 'block';
+    document.getElementById('hpayCode').textContent = order.code;
+    document.getElementById('hpayRef').textContent = order.code;
+    document.getElementById('hpayPrice').textContent = parseInt(order.price).toLocaleString() + 'đ';
+    const qrUrl = 'https://img.vietqr.io/image/VCB-1064516147-compact.png?amount=' + order.price + '&addInfo=' + encodeURIComponent(order.code) + '&accountName=NGUYEN%20HAI%20ANH';
+    document.getElementById('hpayQr').src = qrUrl;
+};
+
+window.closeHistoryPayment = function() {
+    document.getElementById('historyPayment').style.display = 'none';
+};
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') { closeTopUp(); closeHistory(); closeUserInfo(); }
+});
+
+// ===== FLOATING PARTICLES =====
+(function createParticles() {
+    for (let i = 0; i < 40; i++) {
+        const p = document.createElement('div');
+        p.style.cssText = `
+            position: fixed;
+            width: ${Math.random() * 3 + 2}px;
+            height: ${Math.random() * 3 + 2}px;
+            background: rgba(255, 102, 0, ${Math.random() * 0.3});
+            border-radius: 50%;
+            pointer-events: none;
+            left: ${Math.random() * 100}vw;
+            top: ${Math.random() * 100}vh;
+            animation: floatParticle ${Math.random() * 10 + 10}s linear infinite;
+            z-index: 0;
+        `;
+        document.body.appendChild(p);
+    }
+})();
+
+const styleSheet = document.createElement('style');
+styleSheet.textContent = `
+    @keyframes floatParticle {
+        0% { transform: translateY(0) translateX(0); opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { transform: translateY(-100vh) translateX(${Math.random() > 0.5 ? '' : '-'}50px); opacity: 0; }
+    }
+`;
+document.head.appendChild(styleSheet);
+</script>
+
+</body>
+</html>

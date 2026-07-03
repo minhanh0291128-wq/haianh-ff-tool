@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đăng nhập - Hải Anh FF</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',Tahoma,sans-serif; }
+body {
+    background:#0a0a0f;
+    color:#fff;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(135deg,#0a0a0f 0%,#1a0a00 50%,#0a0a0f 100%);
+}
+.auth-card {
+    background:linear-gradient(135deg,#1a1a2e,#16213e);
+    border:1px solid rgba(255,102,0,0.2);
+    border-radius:20px;
+    padding:40px;
+    width:400px;
+    max-width:90%;
+    box-shadow:0 10px 40px rgba(0,0,0,0.5);
+    position:relative;
+    overflow:hidden;
+}
+.auth-card::before {
+    content:'';
+    position:absolute;
+    top:0;left:0;right:0;
+    height:4px;
+    background:linear-gradient(90deg,#ff6600,#ff3300,#ff6600);
+}
+.logo {
+    text-align:center;
+    font-size:32px;
+    font-weight:900;
+    color:#ff6600;
+    text-shadow:0 0 20px rgba(255,102,0,0.3);
+    margin-bottom:5px;
+    text-decoration:none;
+    display:block;
+}
+.logo span { color:#fff; }
+.subtitle {
+    text-align:center;
+    color:#888;
+    font-size:14px;
+    margin-bottom:30px;
+}
+.tabs {
+    display:flex;
+    gap:0;
+    margin-bottom:25px;
+    border-radius:10px;
+    overflow:hidden;
+    border:1px solid rgba(255,102,0,0.2);
+}
+.tab {
+    flex:1;
+    padding:12px;
+    text-align:center;
+    cursor:pointer;
+    font-weight:600;
+    font-size:14px;
+    transition:all 0.3s;
+    background:rgba(0,0,0,0.3);
+    color:#888;
+    border:none;
+}
+.tab.active {
+    background:rgba(255,102,0,0.2);
+    color:#ff6600;
+}
+.tab:hover { background:rgba(255,102,0,0.1); }
+.input-group {
+    margin-bottom:15px;
+}
+.input-group label {
+    display:block;
+    font-size:13px;
+    color:#888;
+    margin-bottom:6px;
+    font-weight:500;
+}
+.input-group input {
+    width:100%;
+    padding:14px 16px;
+    border:2px solid rgba(255,102,0,0.15);
+    border-radius:10px;
+    background:rgba(0,0,0,0.3);
+    color:#fff;
+    font-size:15px;
+    outline:none;
+    transition:all 0.3s;
+}
+.input-group input:focus {
+    border-color:#ff6600;
+    box-shadow:0 0 15px rgba(255,102,0,0.15);
+}
+.input-group input::placeholder { color:#555; }
+.btn-primary {
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:10px;
+    background:linear-gradient(135deg,#ff6600,#ff3300);
+    color:#fff;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    transition:all 0.3s;
+    margin-top:5px;
+}
+.btn-primary:hover {
+    transform:translateY(-2px);
+    box-shadow:0 5px 20px rgba(255,102,0,0.4);
+}
+.btn-primary:disabled {
+    opacity:0.6;
+    cursor:not-allowed;
+    transform:none;
+}
+.btn-google {
+    width:100%;
+    padding:12px;
+    border:1px solid rgba(255,255,255,0.2);
+    border-radius:10px;
+    background:rgba(0,0,0,0.3);
+    color:#fff;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+    transition:all 0.3s;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    margin-top:10px;
+}
+.btn-google:hover {
+    border-color:#ff6600;
+    background:rgba(255,102,0,0.1);
+}
+.divider {
+    text-align:center;
+    color:#555;
+    font-size:13px;
+    margin:20px 0;
+    position:relative;
+}
+.divider::before, .divider::after {
+    content:'';
+    position:absolute;
+    top:50%;
+    width:40%;
+    height:1px;
+    background:rgba(255,255,255,0.1);
+}
+.divider::before { left:0; }
+.divider::after { right:0; }
+.forgot-link {
+    display:block;
+    text-align:right;
+    color:#888;
+    font-size:13px;
+    margin-top:8px;
+    cursor:pointer;
+    text-decoration:none;
+    transition:color 0.3s;
+}
+.forgot-link:hover { color:#ff6600; }
+.auth-switch {
+    text-align:center;
+    color:#888;
+    font-size:14px;
+    margin-top:20px;
+}
+.auth-switch a {
+    color:#ff6600;
+    text-decoration:none;
+    font-weight:600;
+    cursor:pointer;
+}
+.auth-switch a:hover { text-decoration:underline; }
+.error-msg {
+    color:#ff5252;
+    font-size:13px;
+    text-align:center;
+    margin-top:12px;
+    min-height:20px;
+}
+.success-msg {
+    color:#4caf50;
+    font-size:13px;
+    text-align:center;
+    margin-top:12px;
+    min-height:20px;
+}
+.hidden { display:none; }
+.loading {
+    text-align:center;
+    color:#888;
+    font-size:13px;
+    margin-top:12px;
+}
+</style>
+</head>
+<body>
+
+<div class="auth-card" id="loginForm">
+    <a href="/" class="logo">HẢI ANH <span>FF</span></a>
+    <div class="subtitle">Đăng nhập để nạp tiền và theo dõi lịch sử</div>
+
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('login')">Đăng nhập</button>
+        <button class="tab" onclick="switchTab('register')">Đăng ký</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="loginTab">
+        <div class="input-group">
+            <label>📧 Email</label>
+            <input type="email" id="loginEmail" placeholder="your@email.com">
+        </div>
+        <div class="input-group">
+            <label>🔑 Mật khẩu</label>
+            <input type="password" id="loginPassword" placeholder="••••••••" onkeydown="if(event.key==='Enter') login()">
+        </div>
+        <a class="forgot-link" onclick="showForgot()">Quên mật khẩu?</a>
+        <button class="btn-primary" id="loginBtn" onclick="login()">🚀 Đăng nhập</button>
+        <div id="loginError" class="error-msg"></div>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="registerTab" class="hidden">
+        <div class="input-group">
+            <label>📝 Tên hiển thị</label>
+            <input type="text" id="regName" placeholder="VD: haianh" maxlength="20" oninput="checkNameAvail()">
+            <div id="regNameStatus" style="font-size:12px;margin-top:4px;"></div>
+        </div>
+        <div class="input-group">
+            <label>📧 Email</label>
+            <input type="email" id="regEmail" placeholder="your@email.com">
+        </div>
+        <div class="input-group">
+            <label>🔑 Mật khẩu</label>
+            <input type="password" id="regPassword" placeholder="••••••••" onkeydown="if(event.key==='Enter') register()">
+        </div>
+        <button class="btn-primary" id="regBtn" onclick="register()">📝 Đăng ký</button>
+        <div id="regError" class="error-msg"></div>
+    </div>
+
+    <!-- FORGOT PASSWORD -->
+    <div id="forgotTab" class="hidden">
+        <div class="input-group">
+            <label>📧 Nhập email để nhận link đặt lại mật khẩu</label>
+            <input type="email" id="forgotEmail" placeholder="your@email.com" onkeydown="if(event.key==='Enter') resetPassword()">
+        </div>
+        <button class="btn-primary" id="forgotBtn" onclick="resetPassword()">📨 Gửi yêu cầu</button>
+        <div id="forgotError" class="error-msg"></div>
+        <div id="forgotSuccess" class="success-msg"></div>
+        <a class="forgot-link" style="text-align:center;margin-top:12px;" onclick="backToLogin()">← Quay lại đăng nhập</a>
+    </div>
+
+    <div class="divider">HOẶC</div>
+
+    <button class="btn-google" onclick="loginGoogle()">
+        <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
+        Đăng nhập với Google
+    </button>
+
+    <div id="forgotInfo" class="success-msg"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB8GsUB1Rm5d7x--_4b9Ch8J1tr4PQwlZM",
+  authDomain: "haianh-web.firebaseapp.com",
+  projectId: "haianh-web",
+  storageBucket: "haianh-web.firebasestorage.app",
+  messagingSenderId: "501490561221",
+  appId: "1:501490561221:web:16c7333c43a67cae4080ac"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        window.location.href = '/home';
+    }
+});
+
+window.switchTab = function(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    if (tab === 'login') {
+        document.querySelectorAll('.tab')[0].classList.add('active');
+        document.getElementById('loginTab').classList.remove('hidden');
+        document.getElementById('registerTab').classList.add('hidden');
+        document.getElementById('forgotTab').classList.add('hidden');
+    } else {
+        document.querySelectorAll('.tab')[1].classList.add('active');
+        document.getElementById('loginTab').classList.add('hidden');
+        document.getElementById('registerTab').classList.remove('hidden');
+        document.getElementById('forgotTab').classList.add('hidden');
+    }
+    document.getElementById('loginError').textContent = '';
+    document.getElementById('regError').textContent = '';
+};
+
+window.showForgot = function() {
+    document.getElementById('loginTab').classList.add('hidden');
+    document.getElementById('registerTab').classList.add('hidden');
+    document.getElementById('forgotTab').classList.remove('hidden');
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('loginError').textContent = '';
+    document.getElementById('forgotError').textContent = '';
+    document.getElementById('forgotSuccess').textContent = '';
+};
+
+window.backToLogin = function() {
+    document.getElementById('forgotTab').classList.add('hidden');
+    document.getElementById('loginTab').classList.remove('hidden');
+    document.querySelectorAll('.tab')[0].classList.add('active');
+    document.getElementById('forgotError').textContent = '';
+    document.getElementById('forgotSuccess').textContent = '';
+};
+
+window.login = async function() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const btn = document.getElementById('loginBtn');
+    const errEl = document.getElementById('loginError');
+
+    if (!email || !password) {
+        errEl.textContent = '⚠️ Vui lòng nhập email và mật khẩu';
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '⏳ Đang đăng nhập...';
+    errEl.textContent = '';
+
+    try {
+        await signInWithEmailAndPassword(auth, email, password);
+        window.location.href = '/home';
+    } catch (e) {
+        const code = e.code || '';
+        const msgs = {
+            'auth/user-not-found': 'Email chưa được đăng ký',
+            'auth/wrong-password': 'Sai mật khẩu',
+            'auth/invalid-credential': 'Email hoặc mật khẩu không đúng',
+            'auth/invalid-email': 'Email không hợp lệ',
+            'auth/too-many-requests': 'Quá nhiều lần thử, vui lòng thử lại sau'
+        };
+        errEl.textContent = '⚠️ ' + (msgs[code] || 'Email hoặc mật khẩu không đúng');
+    }
+
+    btn.disabled = false;
+    btn.textContent = '🚀 Đăng nhập';
+};
+
+window.checkNameAvail = async function() {
+    const name = document.getElementById('regName').value.trim();
+    const status = document.getElementById('regNameStatus');
+    if (name.length < 2) { status.textContent = ''; return; }
+    try {
+        const r = await fetch('/api/check-name?name=' + encodeURIComponent(name));
+        const d = await r.json();
+        status.textContent = d.available ? '✅ Có thể sử dụng' : '❌ Tên đã được sử dụng';
+        status.style.color = d.available ? '#4caf50' : '#ff5252';
+    } catch { status.textContent = ''; }
+};
+
+window.register = async function() {
+    const name = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value;
+    const btn = document.getElementById('regBtn');
+    const errEl = document.getElementById('regError');
+
+    if (!name || name.length < 2) {
+        errEl.textContent = '⚠️ Vui lòng nhập tên hiển thị (ít nhất 2 ký tự)';
+        return;
+    }
+    if (!email || !password) {
+        errEl.textContent = '⚠️ Vui lòng nhập email và mật khẩu';
+        return;
+    }
+    if (password.length < 6) {
+        errEl.textContent = '⚠️ Mật khẩu phải có ít nhất 6 ký tự';
+        return;
+    }
+
+    // check name availability
+    try {
+        const cr = await fetch('/api/check-name?name=' + encodeURIComponent(name));
+        const cd = await cr.json();
+        if (!cd.available) {
+            errEl.textContent = '⚠️ Tên "' + name + '" đã được sử dụng';
+            return;
+        }
+    } catch {}
+
+    btn.disabled = true;
+    btn.textContent = '⏳ Đang đăng ký...';
+    errEl.textContent = '';
+
+    try {
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        // save display name
+        await fetch('/api/set-name', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ email, name })
+        });
+        window.location.href = '/home';
+    } catch (e) {
+        const code = e.code || '';
+        const msgs = {
+            'auth/email-already-in-use': 'Email đã được đăng ký',
+            'auth/invalid-email': 'Email không hợp lệ',
+            'auth/weak-password': 'Mật khẩu yếu, cần ít nhất 6 ký tự'
+        };
+        errEl.textContent = '⚠️ ' + (msgs[code] || 'Email đã được đăng ký');
+    }
+
+    btn.disabled = false;
+    btn.textContent = '📝 Đăng ký';
+};
+
+window.resetPassword = async function() {
+    const email = document.getElementById('forgotEmail').value.trim();
+    const btn = document.getElementById('forgotBtn');
+    const errEl = document.getElementById('forgotError');
+    const successEl = document.getElementById('forgotSuccess');
+
+    if (!email) {
+        errEl.textContent = '⚠️ Vui lòng nhập email';
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '⏳ Đang gửi...';
+    errEl.textContent = '';
+    successEl.textContent = '';
+
+    try {
+        await sendPasswordResetEmail(auth, email);
+        successEl.textContent = '✅ Email đặt lại mật khẩu đã được gửi! Kiểm tra hộp thư (kể cả Spam).';
+    } catch (e) {
+        const msgs = {
+            'auth/user-not-found': 'Email chưa được đăng ký',
+            'auth/invalid-email': 'Email không hợp lệ',
+            'auth/too-many-requests': 'Quá nhiều yêu cầu, thử lại sau'
+        };
+        const code = e.code?.replace(/auth\//g, '') || '';
+        errEl.textContent = '⚠️ ' + (msgs[code] || e.message);
+    }
+
+    btn.disabled = false;
+    btn.textContent = '📨 Gửi yêu cầu';
+};
+
+window.loginGoogle = async function() {
+    try {
+        await signInWithPopup(auth, provider);
+        window.location.href = '/home';
+    } catch (e) {
+        if (e.code !== 'auth/popup-closed-by-user') {
+            document.getElementById('loginError').textContent = '⚠️ ' + e.message;
+        }
+    }
+};
+</script>
+</body>
+</html>

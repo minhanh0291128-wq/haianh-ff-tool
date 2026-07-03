@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+orders.json
+balances.json
+names.json
+.env
+venv/
+.venv/

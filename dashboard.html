@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HẢI ANH AI</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    min-height:100vh;
+    overflow:hidden;
+    background:linear-gradient(
+        -45deg,
+        #ff0080,
+        #ff1493,
+        #ff69b4,
+        #ff00ff,
+        #da70d6,
+        #ff1493
+    );
+    background-size:400% 400%;
+    animation:bgMove 10s ease infinite;
+}
+
+@keyframes bgMove{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+}
+
+.particle{
+    position:fixed;
+    width:6px;
+    height:6px;
+    background:white;
+    border-radius:50%;
+    opacity:.8;
+    pointer-events:none;
+}
+
+.container{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    padding:20px;
+}
+
+.card{
+    width:100%;
+    max-width:700px;
+    background:rgba(0,0,0,.35);
+    backdrop-filter:blur(18px);
+    border:2px solid rgba(255,255,255,.2);
+    border-radius:30px;
+    padding:35px;
+    box-shadow:0 0 40px rgba(255,20,147,.5);
+}
+
+.logo{
+    text-align:center;
+    font-size:30px;
+    font-weight:bold;
+    color:white;
+    animation:glow 2s infinite;
+}
+
+@keyframes glow{
+    0%{
+        text-shadow:
+        0 0 10px #ff69b4,
+        0 0 20px #ff69b4;
+    }
+
+    50%{
+        text-shadow:
+        0 0 30px #ff00ff,
+        0 0 60px #ff1493;
+    }
+
+    100%{
+        text-shadow:
+        0 0 10px #ff69b4,
+        0 0 20px #ff69b4;
+    }
+}
+
+.subtitle{
+    text-align:center;
+    color:white;
+    font-size:20px;
+    margin-top:10px;
+    margin-bottom:30px;
+}
+
+input{
+    width:100%;
+    padding:16px;
+    border:none;
+    border-radius:15px;
+    font-size:18px;
+    margin-bottom:15px;
+    outline:none;
+}
+
+button{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:15px;
+    font-size:20px;
+    font-weight:bold;
+    cursor:pointer;
+    background:white;
+    transition:.3s;
+}
+
+button:hover{
+    transform:scale(1.03);
+}
+
+.loading{
+    margin-top:25px;
+    text-align:center;
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+}
+
+.phone-title{
+    text-align:center;
+    color:white;
+    font-size:26px;
+    margin:25px 0;
+    text-shadow:
+    0 0 10px #ff00ff,
+    0 0 20px #ff1493;
+}
+
+.item{
+    margin-bottom:20px;
+}
+
+.label{
+    display:flex;
+    justify-content:space-between;
+    font-size:22px;
+    font-weight:bold;
+    color:white;
+    text-shadow:
+    0 0 5px #000,
+    0 0 10px #000,
+    0 0 15px #ff00ff;
+}
+
+.bar{
+    width:100%;
+    height:35px;
+    margin-top:8px;
+    background:rgba(255,255,255,.15);
+    border:2px solid white;
+    border-radius:30px;
+    overflow:hidden;
+}
+
+.fill{
+    height:100%;
+    width:0%;
+    border-radius:30px;
+    background:linear-gradient(
+        90deg,
+        #ff1493,
+        #ff69b4,
+        #ff00ff,
+        #ff69b4,
+        #ff1493
+    );
+    background-size:300% 300%;
+    animation:pinkBar 3s linear infinite;
+    transition:2s;
+    box-shadow:
+    0 0 10px #ff00ff,
+    0 0 20px #ff1493,
+    0 0 30px #ff69b4;
+}
+
+@keyframes pinkBar{
+    0%{background-position:0% 50%;}
+    100%{background-position:100% 50%;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card">
+
+<div class="logo">HẢI ANH</div>
+
+<div class="subtitle">
+💗 AI Sensitivity Generator 💗
+</div>
+
+<input
+id="phone"
+placeholder="📱 Nhập tên điện thoại của bạn..."
+>
+
+<button onclick="searchPhone()">
+🔍 PHÂN TÍCH AI
+</button>
+
+<div id="loading" class="loading"></div>
+
+<div id="result"></div>
+
+</div>
+
+</div>
+
+<script>
+
+for(let i=0;i<80;i++){
+    let p=document.createElement("div");
+    p.className="particle";
+    p.style.left=Math.random()*100+"vw";
+    p.style.top=Math.random()*100+"vh";
+
+    document.body.appendChild(p);
+
+    setInterval(()=>{
+        p.style.top=Math.random()*100+"vh";
+        p.style.left=Math.random()*100+"vw";
+    },5000);
+}
+
+function rand(min,max){
+    return Math.floor(Math.random()*(max-min+1))+min;
+}
+
+function createBar(name,value){
+
+return `
+<div class="item">
+
+<div class="label">
+<span>${name}</span>
+<span>${value}</span>
+</div>
+
+<div class="bar">
+<div class="fill" style="width:${value/2}%"></div>
+</div>
+
+</div>
+`;
+
+}
+
+function searchPhone(){
+
+let phone=document.getElementById("phone").value;
+
+if(phone===""){
+    alert("Vui lòng nhập tên điện thoại");
+    return;
+}
+
+document.getElementById("result").innerHTML="";
+document.getElementById("loading").innerHTML=
+"🤖 AI đang phân tích thiết bị...";
+
+setTimeout(()=>{
+
+let look=rand(150,200);
+let red=rand(130,200);
+let x2=rand(110,180);
+let x4=rand(90,160);
+let sniper=rand(60,130);
+let freecam=rand(120,200);
+
+document.getElementById("loading").innerHTML="";
+
+document.getElementById("result").innerHTML=`
+
+<div class="phone-title">
+📱 ${phone}
+</div>
+
+${createBar("🎯 Nhìn xung quanh",look)}
+
+${createBar("🎯 Ống ngắm hồng tâm",red)}
+
+${createBar("🎯 Ống ngắm 2X",x2)}
+
+${createBar("🎯 Ống ngắm 4X",x4)}
+
+${createBar("🎯 Ống ngắm súng ngắm",sniper)}
+
+${createBar("🎯 Nút camera tự do",freecam)}
+
+`;
+
+},1000);
+
+}
+
+</script>
+
+</body>
+</html>
