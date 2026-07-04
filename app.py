@@ -92,13 +92,13 @@ def detect_region(uid):
 
 @app.route('/')
 def index():
-    return send_from_directory(os.path.dirname(__file__), 'login.html')
-
-@app.route('/home')
-def home():
     orders = load_orders()
     orders = expire_old_orders(orders)
     return render_template('index.html', orders_json=json.dumps(orders, ensure_ascii=False))
+
+@app.route('/login')
+def login_page():
+    return send_from_directory(os.path.dirname(__file__), 'login.html')
 
 @app.route('/api/lookup')
 def api_lookup():

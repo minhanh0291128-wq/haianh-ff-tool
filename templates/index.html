@@ -697,14 +697,18 @@ body {
         <span></span>
     </button>
     <ul class="nav-links" id="navLinks">
-        <li><a href="/home" class="active" onclick="closeMenu()">🔍 Trang chủ</a></li>
+        <li><a href="/" class="active" onclick="closeMenu()">🔍 Tra cứu</a></li>
         <li><a href="/dashboard.html" onclick="closeMenu()">🤖 Trợ lý AI</a></li>
-        <li><a onclick="showHistory();closeMenu()" style="cursor:pointer;">📜 Lịch sử</a></li>
         <div class="nav-auth" id="navAuth">
-            <a class="btn-auth btn-login" onclick="showTopUp()" style="background:linear-gradient(135deg,#ff6600,#ff3300);color:#fff;padding:8px 16px;border-radius:8px;cursor:pointer;font-weight:600;font-size:13px;">💰 Nạp tiền</a>
-            <span id="navBalance" style="color:#4caf50;font-weight:700;font-size:14px;margin:0 4px;">💰 0đ</span>
-            <span class="btn-auth" id="userInfo" style="display:none;font-size:13px;cursor:pointer;" onclick="showUserInfo()"></span>
-            <a href="/" class="btn-auth btn-login" id="btnLogout" onclick="logout()">🚪 Thoát</a>
+            <span id="navGuest">
+                <a onclick="showAuth()" class="btn-auth btn-login" style="border:1px solid #ff6600;color:#ff6600;padding:8px 16px;border-radius:8px;cursor:pointer;font-weight:600;font-size:13px;">🔑 Đăng nhập</a>
+            </span>
+            <span id="navUser" style="display:none;">
+                <a class="btn-auth btn-login" onclick="showTopUp()" style="background:linear-gradient(135deg,#ff6600,#ff3300);color:#fff;padding:8px 16px;border-radius:8px;cursor:pointer;font-weight:600;font-size:13px;">💰 Nạp tiền</a>
+                <span id="navBalance" style="color:#4caf50;font-weight:700;font-size:14px;margin:0 4px;">💰 0đ</span>
+                <span class="btn-auth" id="userInfo" style="display:none;font-size:13px;cursor:pointer;" onclick="showUserInfo()"></span>
+                <a onclick="logout()" class="btn-auth btn-login" style="border:1px solid #ff6600;color:#ff6600;padding:8px 16px;border-radius:8px;cursor:pointer;font-weight:600;font-size:13px;">🚪 Thoát</a>
+            </span>
         </div>
     </ul>
 </nav>
@@ -951,6 +955,67 @@ body {
     </div>
 </div>
 
+<!-- ===== AUTH MODAL ===== -->
+<div class="modal-overlay" id="authModal" onclick="if(event.target===this)closeAuth()">
+    <div class="modal-box" style="width:400px;">
+        <button class="modal-close" onclick="closeAuth()">✕</button>
+        <div class="modal-title">🔑 Đăng nhập</div>
+        <div class="modal-sub">Đăng nhập để nạp tiền và xem lịch sử</div>
+
+        <div id="authLogin">
+            <div class="input-group" style="margin-bottom:12px;">
+                <label style="color:#888;font-size:12px;">📧 Email</label>
+                <input type="email" id="authEmail" placeholder="your@email.com" style="width:100%;padding:10px 14px;border:2px solid rgba(255,102,0,0.15);border-radius:10px;background:rgba(0,0,0,0.3);color:#fff;font-size:14px;outline:none;margin-top:4px;" onkeydown="if(event.key==='Enter') authLogin()">
+            </div>
+            <div class="input-group" style="margin-bottom:8px;">
+                <label style="color:#888;font-size:12px;">🔑 Mật khẩu</label>
+                <input type="password" id="authPass" placeholder="••••••••" style="width:100%;padding:10px 14px;border:2px solid rgba(255,102,0,0.15);border-radius:10px;background:rgba(0,0,0,0.3);color:#fff;font-size:14px;outline:none;margin-top:4px;" onkeydown="if(event.key==='Enter') authLogin()">
+            </div>
+            <div id="authError" style="color:#ff5252;font-size:13px;margin-bottom:8px;min-height:20px;"></div>
+            <button class="btn-check" onclick="authLogin()" id="authLoginBtn" style="width:100%;justify-content:center;">🚀 Đăng nhập</button>
+            <div style="text-align:center;margin-top:10px;">
+                <a onclick="showAuthRegister()" style="color:#ff6600;cursor:pointer;font-size:13px;">Chưa có tài khoản? Đăng ký</a>
+                <span style="color:#555;margin:0 8px;">|</span>
+                <a onclick="showAuthForgot()" style="color:#888;cursor:pointer;font-size:13px;">Quên mật khẩu?</a>
+            </div>
+        </div>
+
+        <div id="authRegister" style="display:none;">
+            <div style="margin-bottom:12px;">
+                <label style="color:#888;font-size:12px;">📝 Tên hiển thị</label>
+                <input type="text" id="authRegName" placeholder="VD: haianh" maxlength="20" style="width:100%;padding:10px 14px;border:2px solid rgba(255,102,0,0.15);border-radius:10px;background:rgba(0,0,0,0.3);color:#fff;font-size:14px;outline:none;margin-top:4px;" oninput="checkAuthName()" onkeydown="if(event.key==='Enter') authRegister()">
+                <div id="authRegNameStatus" style="font-size:12px;margin-top:4px;"></div>
+            </div>
+            <div style="margin-bottom:12px;">
+                <label style="color:#888;font-size:12px;">📧 Email</label>
+                <input type="email" id="authRegEmail" placeholder="your@email.com" style="width:100%;padding:10px 14px;border:2px solid rgba(255,102,0,0.15);border-radius:10px;background:rgba(0,0,0,0.3);color:#fff;font-size:14px;outline:none;margin-top:4px;" onkeydown="if(event.key==='Enter') authRegister()">
+            </div>
+            <div style="margin-bottom:8px;">
+                <label style="color:#888;font-size:12px;">🔑 Mật khẩu</label>
+                <input type="password" id="authRegPass" placeholder="Ít nhất 6 ký tự" style="width:100%;padding:10px 14px;border:2px solid rgba(255,102,0,0.15);border-radius:10px;background:rgba(0,0,0,0.3);color:#fff;font-size:14px;outline:none;margin-top:4px;" onkeydown="if(event.key==='Enter') authRegister()">
+            </div>
+            <div id="authRegError" style="color:#ff5252;font-size:13px;margin-bottom:8px;min-height:20px;"></div>
+            <button class="btn-check" onclick="authRegister()" id="authRegBtn" style="width:100%;justify-content:center;">📝 Đăng ký</button>
+            <div style="text-align:center;margin-top:10px;">
+                <a onclick="showAuthLogin()" style="color:#ff6600;cursor:pointer;font-size:13px;">Đã có tài khoản? Đăng nhập</a>
+            </div>
+        </div>
+
+        <div id="authForgot" style="display:none;">
+            <div style="margin-bottom:12px;">
+                <label style="color:#888;font-size:12px;">📧 Email</label>
+                <input type="email" id="authForgotEmail" placeholder="your@email.com" style="width:100%;padding:10px 14px;border:2px solid rgba(255,102,0,0.15);border-radius:10px;background:rgba(0,0,0,0.3);color:#fff;font-size:14px;outline:none;margin-top:4px;" onkeydown="if(event.key==='Enter') authResetPass()">
+            </div>
+            <div id="authForgotError" style="color:#ff5252;font-size:13px;margin-bottom:8px;min-height:20px;"></div>
+            <div id="authForgotSuccess" style="color:#4caf50;font-size:13px;margin-bottom:8px;min-height:20px;"></div>
+            <button class="btn-check" onclick="authResetPass()" id="authForgotBtn" style="width:100%;justify-content:center;">📨 Gửi yêu cầu</button>
+            <div style="text-align:center;margin-top:10px;">
+                <a onclick="showAuthLogin()" style="color:#ff6600;cursor:pointer;font-size:13px;">Quay lại đăng nhập</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- ===== FOOTER ===== -->
 <div class="footer">
     © 2026 HẢI ANH FF - Công cụ tra cứu Free Fire
@@ -960,7 +1025,7 @@ body {
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import { getAuth, signOut, onAuthStateChanged, EmailAuthProvider, updatePassword, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+import { getAuth, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, EmailAuthProvider, updatePassword, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB8GsUB1Rm5d7x--_4b9Ch8J1tr4PQwlZM",
@@ -999,22 +1064,113 @@ function updateUserInfo() {
 }
 
 onAuthStateChanged(auth, (user) => {
-    if (!user) {
-        window.location.href = '/';
-        return;
-    }
-    currentUserEmail = user.email;
+    const guest = document.getElementById('navGuest');
+    const navUser = document.getElementById('navUser');
     const infoEl = document.getElementById('userInfo');
-    if (infoEl) {
-        infoEl.style.display = 'inline';
-        updateUserInfo();
+    if (user) {
+        currentUserEmail = user.email;
+        guest.style.display = 'none';
+        navUser.style.display = 'inline-flex';
+        if (infoEl) { infoEl.style.display = 'inline'; updateUserInfo(); }
+    } else {
+        currentUserEmail = '';
+        guest.style.display = 'inline';
+        navUser.style.display = 'none';
+        if (infoEl) infoEl.style.display = 'none';
     }
 });
 
 window.logout = function() {
-    signOut(auth).then(() => {
-        window.location.href = '/';
-    });
+    signOut(auth);
+};
+
+// ===== AUTH =====
+window.showAuth = function() {
+    document.getElementById('authModal').classList.add('show');
+    document.getElementById('authLogin').style.display = 'block';
+    document.getElementById('authRegister').style.display = 'none';
+    document.getElementById('authForgot').style.display = 'none';
+    document.getElementById('authError').textContent = '';
+    document.getElementById('authEmail').value = '';
+    document.getElementById('authPass').value = '';
+};
+window.closeAuth = function() {
+    document.getElementById('authModal').classList.remove('show');
+};
+window.showAuthRegister = function() {
+    document.getElementById('authLogin').style.display = 'none';
+    document.getElementById('authRegister').style.display = 'block';
+    document.getElementById('authForgot').style.display = 'none';
+    document.getElementById('authRegError').textContent = '';
+};
+window.showAuthLogin = function() {
+    document.getElementById('authLogin').style.display = 'block';
+    document.getElementById('authRegister').style.display = 'none';
+    document.getElementById('authForgot').style.display = 'none';
+};
+window.showAuthForgot = function() {
+    document.getElementById('authLogin').style.display = 'none';
+    document.getElementById('authRegister').style.display = 'none';
+    document.getElementById('authForgot').style.display = 'block';
+    document.getElementById('authForgotError').textContent = '';
+    document.getElementById('authForgotSuccess').textContent = '';
+};
+window.checkAuthName = async function() {
+    const name = document.getElementById('authRegName').value.trim();
+    const status = document.getElementById('authRegNameStatus');
+    if (name.length < 2) { status.textContent = ''; return; }
+    try {
+        const r = await fetch('/api/check-name?name=' + encodeURIComponent(name));
+        const d = await r.json();
+        status.textContent = d.available ? '✅ Có thể sử dụng' : '❌ Tên đã được sử dụng';
+        status.style.color = d.available ? '#4caf50' : '#ff5252';
+    } catch { status.textContent = ''; }
+};
+window.authLogin = async function() {
+    const email = document.getElementById('authEmail').value.trim();
+    const pass = document.getElementById('authPass').value;
+    const errEl = document.getElementById('authError');
+    if (!email || !pass) { errEl.textContent = '⚠️ Vui lòng nhập email và mật khẩu'; return; }
+    document.getElementById('authLoginBtn').disabled = true; document.getElementById('authLoginBtn').textContent = '⏳...'; errEl.textContent = '';
+    try {
+        await signInWithEmailAndPassword(auth, email, pass);
+        closeAuth();
+    } catch (e) {
+        const c = e.code || '';
+        const msgs = { 'auth/user-not-found': 'Email chưa đăng ký', 'auth/wrong-password': 'Sai mật khẩu', 'auth/invalid-credential': 'Email hoặc mật khẩu không đúng', 'auth/invalid-email': 'Email không hợp lệ', 'auth/too-many-requests': 'Quá nhiều lần thử' };
+        errEl.textContent = '⚠️ ' + (msgs[c] || 'Email hoặc mật khẩu không đúng');
+    }
+    document.getElementById('authLoginBtn').disabled = false; document.getElementById('authLoginBtn').textContent = '🚀 Đăng nhập';
+};
+window.authRegister = async function() {
+    const name = document.getElementById('authRegName').value.trim();
+    const email = document.getElementById('authRegEmail').value.trim();
+    const pass = document.getElementById('authRegPass').value;
+    const errEl = document.getElementById('authRegError');
+    if (!name || name.length < 2) { errEl.textContent = '⚠️ Nhập tên hiển thị'; return; }
+    if (!email || !pass) { errEl.textContent = '⚠️ Nhập email và mật khẩu'; return; }
+    if (pass.length < 6) { errEl.textContent = '⚠️ Mật khẩu ít nhất 6 ký tự'; return; }
+    try { const cr = await fetch('/api/check-name?name=' + encodeURIComponent(name)); const cd = await cr.json(); if (!cd.available) { errEl.textContent = '⚠️ Tên đã được sử dụng'; return; } } catch {}
+    document.getElementById('authRegBtn').disabled = true; document.getElementById('authRegBtn').textContent = '⏳...'; errEl.textContent = '';
+    try {
+        await createUserWithEmailAndPassword(auth, email, pass);
+        await fetch('/api/set-name', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email, name }) });
+        closeAuth();
+    } catch (e) {
+        const c = e.code || '';
+        const msgs = { 'auth/email-already-in-use': 'Email đã được đăng ký', 'auth/invalid-email': 'Email không hợp lệ', 'auth/weak-password': 'Mật khẩu yếu' };
+        errEl.textContent = '⚠️ ' + (msgs[c] || 'Email đã được đăng ký');
+    }
+    document.getElementById('authRegBtn').disabled = false; document.getElementById('authRegBtn').textContent = '📝 Đăng ký';
+};
+window.authResetPass = async function() {
+    const email = document.getElementById('authForgotEmail').value.trim();
+    const errEl = document.getElementById('authForgotError');
+    const sucEl = document.getElementById('authForgotSuccess');
+    if (!email) { errEl.textContent = '⚠️ Nhập email'; return; }
+    document.getElementById('authForgotBtn').disabled = true; document.getElementById('authForgotBtn').textContent = '⏳...'; errEl.textContent = ''; sucEl.textContent = '';
+    try { await sendPasswordResetEmail(auth, email); sucEl.textContent = '✅ Email đã gửi! Kiểm tra Spam.'; } catch (e) { errEl.textContent = '⚠️ ' + ({ 'auth/user-not-found': 'Email chưa đăng ký', 'auth/invalid-email': 'Email không hợp lệ', 'auth/too-many-requests': 'Quá nhiều yêu cầu' }[e.code || ''] || 'Không thể gửi'); }
+    document.getElementById('authForgotBtn').disabled = false; document.getElementById('authForgotBtn').textContent = '📨 Gửi yêu cầu';
 };
 
 // ===== MOBILE MENU =====
@@ -1161,7 +1317,7 @@ function startQrTimer(id, timerId, expiredId) {
 
 // ===== USER INFO =====
 window.showUserInfo = async function() {
-    if (!currentUserEmail) { window.location.href = '/'; return; }
+    if (!currentUserEmail) { showAuth(); return; }
     document.getElementById('userModal').classList.add('show');
     document.getElementById('changePassSection').style.display = 'none';
     document.getElementById('passMsg').textContent = '';
@@ -1259,7 +1415,7 @@ window.changePassword = async function() {
 let topupAmount = 0;
 
 window.showTopUp = function() {
-    if (!currentUserEmail) { alert('Vui lòng đăng nhập'); window.location.href='/'; return; }
+    if (!currentUserEmail) { showAuth(); return; }
     document.getElementById('topupModal').classList.add('show');
     document.getElementById('topupResult').style.display = 'none';
     document.getElementById('topupError').classList.remove('show');
@@ -1357,7 +1513,7 @@ function mergeOrders() {
     return merged;
 }
 window.showHistory = function() {
-    if (!currentUserEmail) { alert('Vui lòng đăng nhập'); window.location.href='/'; return; }
+    if (!currentUserEmail) { showAuth(); return; }
     document.getElementById('historyModal').classList.add('show');
     const list = document.getElementById('historyList');
     try {
