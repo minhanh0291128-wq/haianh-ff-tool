@@ -1117,7 +1117,8 @@ window.lookupUID = async function() {
         const level = data.level || '?';
         const likes = data.liked || 0;
         const guild = data.guild || 'Không có';
-        const region = data.region || 'VN';
+        const regionMap = { 'VN':'Việt Nam','SG':'Singapore','ID':'Indonesia','TH':'Thái Lan','TW':'Đài Loan','IND':'Ấn Độ','BD':'Bangladesh','BR':'Brazil','US':'Hoa Kỳ','PK':'Pakistan','MY':'Malaysia','ME':'Trung Đông','EU':'Châu Âu','CIS':'CIS','RU':'Nga' };
+        const region = regionMap[data.region] || data.region || 'Việt Nam';
 
         document.getElementById('lookupName').textContent = name;
         document.getElementById('lookupUID').textContent = uid;
