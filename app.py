@@ -3,88 +3,12 @@ import requests
 import os
 import json
 import re
-import threading
-import queue
+import subprocess
+import sys
 
 os.environ.setdefault('PLAYWRIGHT_BROWSERS_PATH', os.path.join(os.path.dirname(__file__), '.browsers'))
 
 app = Flask(__name__)
-
-class TikTokWorker(threading.Thread):
-    def __init__(self):
-        super().__init__(daemon=True)
-        self._req_queue = queue.Queue()
-        self._res_queue = queue.Queue()
-        self._browser = None
-        self._pw = None
-        self.start()
-
-    def _init_browser(self):
-        from playwright.sync_api import sync_playwright
-        self._pw = sync_playwright().start()
-        self._browser = self._pw.chromium.launch(
-            headless=True,
-            args=[
-                '--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage',
-                '--disable-setuid-sandbox', '--no-first-run', '--disable-extensions',
-                '--disable-background-networking', '--disable-sync', '--mute-audio',
-                '--js-flags=--max_old_space_size=256',
-            ]
-        )
-
-    def run(self):
-        while True:
-            username = self._req_queue.get()
-            if username is None:
-                break
-            result = self._lookup(username)
-            self._res_queue.put(result)
-
-    def _lookup(self, username):
-        page = None
-        try:
-            if self._browser is None:
-                self._init_browser()
-            page = self._browser.new_page()
-            page.goto(f'https://www.tiktok.com/@{username}', wait_until='networkidle', timeout=30000)
-            content = page.content()
-            match = re.search(r'<script id="__UNIVERSAL_DATA_FOR_REHYDRATION__"[^>]*>([^<]+)</script>', content)
-            if not match:
-                return ({'error': 'Không thể lấy dữ liệu TikTok'}, 502)
-            data = json.loads(match.group(1))
-            scope = data.get('__DEFAULT_SCOPE__', {})
-            user_detail = scope.get('webapp.user-detail', {})
-            if not user_detail or 'userInfo' not in user_detail:
-                return ({'error': 'Không tìm thấy user'}, 404)
-            info = user_detail['userInfo']
-            user = info.get('user', {})
-            stats = info.get('stats', {})
-            return ({
-                'nickname': user.get('nickname', ''),
-                'username': user.get('uniqueId', username),
-                'avatar': user.get('avatarMedium', ''),
-                'signature': user.get('signature', ''),
-                'verified': user.get('verified', False),
-                'private': user.get('privateAccount', False),
-                'createdAt': user.get('createTime', 0),
-                'followers': stats.get('followerCount', 0),
-                'following': stats.get('followingCount', 0),
-                'hearts': stats.get('heartCount', 0),
-                'videos': stats.get('videoCount', 0)
-            }, 200)
-        except Exception as e:
-            return ({'error': f'Lỗi kết nối TikTok: {str(e)[:100]}'}, 502)
-        finally:
-            if page:
-                try: page.close()
-                except: pass
-
-    def lookup(self, username, timeout=65):
-        self._req_queue.put(username)
-        result = self._res_queue.get(timeout=timeout)
-        return result
-
-_tiktok_worker = TikTokWorker()
 
 @app.after_request
 def add_common_headers(resp):
@@ -197,11 +121,21 @@ def api_tiktok():
     username = request.args.get('username', '').strip().replace('@', '')
     if not username:
         return jsonify({'error': 'Thiếu username'}), 400
+    script = os.path.join(os.path.dirname(__file__), 'tiktok_scraper.py')
     try:
-        data, status = _tiktok_worker.lookup(username, timeout=65)
-        return jsonify(data), status
-    except queue.Empty:
+        result = subprocess.run(
+            [sys.executable, script, username],
+            capture_output=True, text=True, timeout=65,
+            env={**os.environ, 'PLAYWRIGHT_BROWSERS_PATH': os.path.join(os.path.dirname(__file__), '.browsers')}
+        )
+        if result.returncode != 0:
+            return jsonify({'error': f'Lỗi kết nối TikTok: {result.stderr.strip()[:100]}'}), 502
+        data = json.loads(result.stdout)
+        return jsonify(data)
+    except subprocess.TimeoutExpired:
         return jsonify({'error': 'Lỗi kết nối TikTok: timeout'}), 502
+    except json.JSONDecodeError:
+        return jsonify({'error': 'Lỗi kết nối TikTok: response parse error'}), 502
     except Exception as e:
         return jsonify({'error': f'Lỗi kết nối TikTok: {str(e)[:100]}'}), 502
 
