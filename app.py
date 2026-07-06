@@ -14,12 +14,21 @@ def get_browser():
     global _pw, _browser
     if _browser is None:
         _pw = sync_playwright().start()
-        try:
-            _browser = _pw.chromium.launch(headless=True, args=['--no-sandbox'])
-        except Exception:
-            import subprocess, sys
-            subprocess.run([sys.executable, '-m', 'playwright', 'install', 'chromium'], check=True)
-            _browser = _pw.chromium.launch(headless=True, args=['--no-sandbox'])
+        _browser = _pw.chromium.launch(
+            headless=True,
+            args=[
+                '--no-sandbox',
+                '--disable-gpu',
+                '--disable-dev-shm-usage',
+                '--disable-setuid-sandbox',
+                '--no-first-run',
+                '--disable-extensions',
+                '--disable-background-networking',
+                '--disable-sync',
+                '--mute-audio',
+                '--js-flags=--max_old_space_size=256',
+            ]
+        )
     return _browser
 
 @app.after_request
