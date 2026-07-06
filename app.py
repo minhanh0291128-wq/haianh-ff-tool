@@ -3,18 +3,19 @@ import requests
 import os
 import json
 import re
-from playwright.sync_api import sync_playwright
+import asyncio
+from playwright.async_api import async_playwright
 
 app = Flask(__name__)
 
 _pw = None
 _browser = None
 
-def get_browser():
+async def get_browser():
     global _pw, _browser
     if _browser is None:
-        _pw = sync_playwright().start()
-        _browser = _pw.chromium.launch(
+        _pw = await async_playwright().start()
+        _browser = await _pw.chromium.launch(
             headless=True,
             args=[
                 '--no-sandbox',
@@ -141,16 +142,16 @@ def api_set_name():
     return jsonify({'success': True, 'name': name})
 
 @app.route('/api/tiktok')
-def api_tiktok():
+async def api_tiktok():
     username = request.args.get('username', '').strip().replace('@', '')
     if not username:
         return jsonify({'error': 'Thiếu username'}), 400
     page = None
     try:
-        browser = get_browser()
-        page = browser.new_page()
-        page.goto(f'https://www.tiktok.com/@{username}', wait_until='networkidle', timeout=30000)
-        content = page.content()
+        browser = await get_browser()
+        page = await browser.new_page()
+        await page.goto(f'https://www.tiktok.com/@{username}', wait_until='networkidle', timeout=30000)
+        content = await page.content()
         match = re.search(r'<script id="__UNIVERSAL_DATA_FOR_REHYDRATION__"[^>]*>([^<]+)</script>', content)
         if not match:
             return jsonify({'error': 'Không thể lấy dữ liệu TikTok'}), 502
@@ -179,7 +180,7 @@ def api_tiktok():
         return jsonify({'error': f'Lỗi kết nối TikTok: {str(e)[:100]}'}), 502
     finally:
         if page:
-            try: page.close()
+            try: await page.close()
             except: pass
 
 @app.route('/<path:filename>')
