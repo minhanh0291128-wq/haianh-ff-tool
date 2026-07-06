@@ -1,13 +1,9 @@
-import nest_asyncio
-nest_asyncio.apply()
-
 from flask import Flask, render_template, jsonify, request, send_from_directory
 import requests
 import os
 import json
 import re
-import asyncio
-from playwright.async_api import async_playwright
+import threading
 
 os.environ.setdefault('PLAYWRIGHT_BROWSERS_PATH', os.path.join(os.path.dirname(__file__), '.browsers'))
 
@@ -15,26 +11,30 @@ app = Flask(__name__)
 
 _pw = None
 _browser = None
+_browser_lock = threading.Lock()
 
-async def get_browser():
+def get_browser():
     global _pw, _browser
     if _browser is None:
-        _pw = await async_playwright().start()
-        _browser = await _pw.chromium.launch(
-            headless=True,
-            args=[
-                '--no-sandbox',
-                '--disable-gpu',
-                '--disable-dev-shm-usage',
-                '--disable-setuid-sandbox',
-                '--no-first-run',
-                '--disable-extensions',
-                '--disable-background-networking',
-                '--disable-sync',
-                '--mute-audio',
-                '--js-flags=--max_old_space_size=256',
-            ]
-        )
+        with _browser_lock:
+            if _browser is None:
+                from playwright.sync_api import sync_playwright
+                _pw = sync_playwright().start()
+                _browser = _pw.chromium.launch(
+                    headless=True,
+                    args=[
+                        '--no-sandbox',
+                        '--disable-gpu',
+                        '--disable-dev-shm-usage',
+                        '--disable-setuid-sandbox',
+                        '--no-first-run',
+                        '--disable-extensions',
+                        '--disable-background-networking',
+                        '--disable-sync',
+                        '--mute-audio',
+                        '--js-flags=--max_old_space_size=256',
+                    ]
+                )
     return _browser
 
 @app.after_request
@@ -78,12 +78,8 @@ def api_lookup():
     uid = request.args.get('uid', '').strip()
     if not uid or len(uid) < 6 or not uid.isdigit():
         return jsonify({'error': 'UID không hợp lệ'}), 400
-
-    tried_regions = set()
-    first_region = detect_region(uid)
-
-    for region in [first_region] + [r for r in REGIONS if r != first_region]:
-        tried_regions.add(region)
+    first = detect_region(uid)
+    for region in [first] + [r for r in REGIONS if r != first]:
         url = f'{API_BASE}/info?region={region}&uid={uid}&key={API_KEY}'
         try:
             resp = requests.get(url, timeout=10, headers={'User-Agent': 'HaianhFFTool/1.0 (+https://haianh-ff-tool.onrender.com)'})
@@ -112,7 +108,6 @@ def api_lookup():
                 })
         except requests.exceptions.RequestException:
             continue
-
     return jsonify({'error': f'Không tìm thấy UID {uid} ở bất kỳ khu vực nào. Kiểm tra lại UID.'}), 404
 
 @app.route('/api/check-name')
@@ -136,32 +131,25 @@ def api_set_name():
     data = request.get_json(silent=True) or {}
     email = str(data.get('email', '')).strip().lower()
     name = str(data.get('name', '')).strip()
-
     if not email or '@' not in email:
         return jsonify({'error': 'Email không hợp lệ'}), 400
     if not name or len(name) < 2:
         return jsonify({'error': 'Tên phải có ít nhất 2 ký tự'}), 400
-
     names = load_names()
     for e, n in names.items():
         if n.lower() == name.lower() and e != email:
             return jsonify({'error': 'Tên đã được sử dụng'}), 400
-
     names[email] = name
     save_names(names)
     return jsonify({'success': True, 'name': name})
 
-@app.route('/api/tiktok')
-async def api_tiktok():
-    username = request.args.get('username', '').strip().replace('@', '')
-    if not username:
-        return jsonify({'error': 'Thiếu username'}), 400
+def _tiktok_lookup(username):
     page = None
     try:
-        browser = await get_browser()
-        page = await browser.new_page()
-        await page.goto(f'https://www.tiktok.com/@{username}', wait_until='networkidle', timeout=30000)
-        content = await page.content()
+        browser = get_browser()
+        page = browser.new_page()
+        page.goto(f'https://www.tiktok.com/@{username}', wait_until='networkidle', timeout=30000)
+        content = page.content()
         match = re.search(r'<script id="__UNIVERSAL_DATA_FOR_REHYDRATION__"[^>]*>([^<]+)</script>', content)
         if not match:
             return jsonify({'error': 'Không thể lấy dữ liệu TikTok'}), 502
@@ -190,8 +178,21 @@ async def api_tiktok():
         return jsonify({'error': f'Lỗi kết nối TikTok: {str(e)[:100]}'}), 502
     finally:
         if page:
-            try: await page.close()
+            try: page.close()
             except: pass
+
+@app.route('/api/tiktok')
+def api_tiktok():
+    username = request.args.get('username', '').strip().replace('@', '')
+    if not username:
+        return jsonify({'error': 'Thiếu username'}), 400
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        future = pool.submit(_tiktok_lookup, username)
+        try:
+            return future.result(timeout=65)
+        except Exception as e:
+            return jsonify({'error': f'Lỗi kết nối TikTok: {str(e)[:100]}'}), 502
 
 @app.route('/<path:filename>')
 def static_files(filename):
