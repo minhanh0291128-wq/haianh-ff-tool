@@ -760,7 +760,8 @@ body::after {
         <span></span>
     </button>
     <ul class="nav-links" id="navLinks">
-        <li><a href="/" class="active" onclick="closeMenu()">🔍 Tra cứu</a></li>
+        <li><a href="/" class="active" onclick="switchTab('ff');closeMenu()">🔍 Tra cứu</a></li>
+        <li><a href="#" onclick="switchTab('tiktok');closeMenu()">🎵 TikTok</a></li>
         <li><a href="/dashboard.html" onclick="closeMenu()">🤖 Trợ lý AI</a></li>
         <div class="nav-auth" id="navAuth">
             <span id="navGuest">
@@ -833,7 +834,60 @@ body::after {
     </div>
 </section>
 
-
+<!-- ===== TIKTOK SECTION ===== -->
+<section class="section" id="tiktok" style="display:none;">
+    <h2 class="section-title">🎵 Tra cứu TikTok</h2>
+    <p class="section-desc">Nhập username TikTok để xem thông tin hồ sơ</p>
+    <div class="uid-card">
+        <div class="uid-input-group">
+            <input type="text" class="uid-input" id="ttInput" placeholder="@username hoặc username..." onkeydown="if(event.key==='Enter') lookupTikTok()">
+            <button class="btn-check" id="btnTT" onclick="lookupTikTok()">🎵 Tra cứu</button>
+        </div>
+        <div class="loading-spinner" id="ttSpinner">
+            <div class="spinner"></div>
+            <div class="loading-text">🔄 Đang tra cứu TikTok...</div>
+        </div>
+        <div class="error-msg" id="ttError"></div>
+        <div class="lookup-result" id="ttResult">
+            <div class="lookup-card">
+                <div class="lookup-header">
+                    <div class="lookup-avatar" id="ttAvatar">🎵</div>
+                    <div>
+                        <div class="lookup-name" id="ttName">--</div>
+                        <div class="lookup-uid">@<span id="ttUsername">--</span></div>
+                    </div>
+                </div>
+                <div class="lookup-grid">
+                    <div class="lookup-item">
+                        <span class="lookup-label">👥 Followers</span>
+                        <span class="lookup-val" id="ttFollowers">--</span>
+                    </div>
+                    <div class="lookup-item">
+                        <span class="lookup-label">🔁 Following</span>
+                        <span class="lookup-val" id="ttFollowing">--</span>
+                    </div>
+                    <div class="lookup-item">
+                        <span class="lookup-label">❤️ Hearts</span>
+                        <span class="lookup-val" id="ttHearts">--</span>
+                    </div>
+                    <div class="lookup-item">
+                        <span class="lookup-label">🎬 Videos</span>
+                        <span class="lookup-val" id="ttVideos">--</span>
+                    </div>
+                    <div class="lookup-item">
+                        <span class="lookup-label">🌍 Quốc gia</span>
+                        <span class="lookup-val" id="ttCountry">--</span>
+                    </div>
+                    <div class="lookup-item">
+                        <span class="lookup-label">📅 Tham gia</span>
+                        <span class="lookup-val" id="ttCreated">--</span>
+                    </div>
+                </div>
+                <div style="margin-top:10px;padding:10px;background:rgba(0,0,0,0.2);border-radius:8px;text-align:center;font-size:13px;color:#888;" id="ttBio">--</div>
+            </div>
+        </div>
+    </div>
+</section>
 
 
 
@@ -1047,6 +1101,72 @@ window.checkAuthName = async function() {
         status.style.color = d.available ? '#4caf50' : '#ff5252';
     } catch { status.textContent = ''; }
 };
+
+// ===== TAB SWITCHING =====
+window.switchTab = function(tab) {
+    document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+    document.getElementById('lookup').style.display = tab === 'ff' ? 'block' : 'none';
+    document.getElementById('tiktok').style.display = tab === 'tiktok' ? 'block' : 'none';
+    if (tab === 'ff') document.querySelector('.nav-links a[href="/"]').classList.add('active');
+    else document.querySelector('.nav-links a[href="#"]').classList.add('active');
+};
+
+// ===== TIKTOK LOOKUP =====
+window.lookupTikTok = async function() {
+    const input = document.getElementById('ttInput').value.trim().replace('@','');
+    const btn = document.getElementById('btnTT');
+    const spinner = document.getElementById('ttSpinner');
+    const errorMsg = document.getElementById('ttError');
+    const result = document.getElementById('ttResult');
+
+    if (!input) { alert('Vui lòng nhập username TikTok'); return; }
+
+    result.classList.remove('show');
+    errorMsg.classList.remove('show');
+    spinner.classList.add('show');
+    btn.disabled = true;
+
+    try {
+        const res = await fetch('/api/tiktok?username=' + encodeURIComponent(input));
+        spinner.classList.remove('show');
+        const data = await res.json();
+
+        if (!res.ok || data.error) {
+            errorMsg.textContent = '⚠️ ' + (data.error || 'Không tìm thấy');
+            errorMsg.classList.add('show');
+            btn.disabled = false;
+            return;
+        }
+
+        function n(v) { return (v ?? '- -') == '- -' ? '--' : v; }
+        function fmtNum(n) { return n.toLocaleString(); }
+        document.getElementById('ttName').textContent = n(data.nickname);
+        document.getElementById('ttUsername').textContent = data.username || input;
+        document.getElementById('ttFollowers').textContent = fmtNum(data.followers ?? 0);
+        document.getElementById('ttFollowing').textContent = fmtNum(data.following ?? 0);
+        document.getElementById('ttHearts').textContent = fmtNum(data.hearts ?? 0);
+        document.getElementById('ttVideos').textContent = fmtNum(data.videos ?? 0);
+        document.getElementById('ttCountry').textContent = '--';
+        if (data.createdAt) {
+            const d = new Date(data.createdAt * 1000);
+            document.getElementById('ttCreated').textContent = d.toLocaleDateString('vi-VN');
+        } else {
+            document.getElementById('ttCreated').textContent = '--';
+        }
+        document.getElementById('ttBio').textContent = data.signature || '(không có bio)';
+        if (data.avatar) document.getElementById('ttAvatar').innerHTML = '<img src="' + data.avatar + '" style="width:48px;height:48px;border-radius:50%;object-fit:cover;">';
+        else document.getElementById('ttAvatar').textContent = '🎵';
+
+        result.classList.add('show');
+        btn.disabled = false;
+    } catch {
+        spinner.classList.remove('show');
+        errorMsg.textContent = '⚠️ Lỗi kết nối máy chủ';
+        errorMsg.classList.add('show');
+        btn.disabled = false;
+    }
+};
+
 window.authLogin = async function() {
     const email = document.getElementById('authEmail').value.trim();
     const pass = document.getElementById('authPass').value;

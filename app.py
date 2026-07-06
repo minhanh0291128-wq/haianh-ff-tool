@@ -2,8 +2,20 @@ from flask import Flask, render_template, jsonify, request, send_from_directory
 import requests
 import os
 import json
+import re
+from playwright.sync_api import sync_playwright
 
 app = Flask(__name__)
+
+_pw = None
+_browser = None
+
+def get_browser():
+    global _pw, _browser
+    if _browser is None:
+        _pw = sync_playwright().start()
+        _browser = _pw.chromium.launch(headless=True, args=['--no-sandbox'])
+    return _browser
 
 @app.after_request
 def add_common_headers(resp):
@@ -113,6 +125,46 @@ def api_set_name():
     names[email] = name
     save_names(names)
     return jsonify({'success': True, 'name': name})
+
+@app.route('/api/tiktok')
+def api_tiktok():
+    username = request.args.get('username', '').strip().replace('@', '')
+    if not username:
+        return jsonify({'error': 'Thiếu username'}), 400
+    browser = get_browser()
+    page = browser.new_page()
+    try:
+        page.goto(f'https://www.tiktok.com/@{username}', wait_until='networkidle', timeout=30000)
+        content = page.content()
+        page.close()
+        match = re.search(r'<script id="__UNIVERSAL_DATA_FOR_REHYDRATION__"[^>]*>([^<]+)</script>', content)
+        if not match:
+            return jsonify({'error': 'Không thể lấy dữ liệu TikTok'}), 502
+        data = json.loads(match.group(1))
+        scope = data.get('__DEFAULT_SCOPE__', {})
+        user_detail = scope.get('webapp.user-detail', {})
+        if not user_detail or 'userInfo' not in user_detail:
+            return jsonify({'error': 'Không tìm thấy user'}), 404
+        info = user_detail['userInfo']
+        user = info.get('user', {})
+        stats = info.get('stats', {})
+        return jsonify({
+            'nickname': user.get('nickname', ''),
+            'username': user.get('uniqueId', username),
+            'avatar': user.get('avatarMedium', ''),
+            'signature': user.get('signature', ''),
+            'verified': user.get('verified', False),
+            'private': user.get('privateAccount', False),
+            'createdAt': user.get('createTime', 0),
+            'followers': stats.get('followerCount', 0),
+            'following': stats.get('followingCount', 0),
+            'hearts': stats.get('heartCount', 0),
+            'videos': stats.get('videoCount', 0)
+        })
+    except Exception as e:
+        try: page.close()
+        except: pass
+        return jsonify({'error': 'Lỗi kết nối TikTok'}), 502
 
 @app.route('/<path:filename>')
 def static_files(filename):
