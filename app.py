@@ -14,7 +14,12 @@ def get_browser():
     global _pw, _browser
     if _browser is None:
         _pw = sync_playwright().start()
-        _browser = _pw.chromium.launch(headless=True, args=['--no-sandbox'])
+        try:
+            _browser = _pw.chromium.launch(headless=True, args=['--no-sandbox'])
+        except Exception:
+            import subprocess, sys
+            subprocess.run([sys.executable, '-m', 'playwright', 'install', 'chromium'], check=True)
+            _browser = _pw.chromium.launch(headless=True, args=['--no-sandbox'])
     return _browser
 
 @app.after_request
@@ -131,9 +136,9 @@ def api_tiktok():
     username = request.args.get('username', '').strip().replace('@', '')
     if not username:
         return jsonify({'error': 'Thiếu username'}), 400
-    browser = get_browser()
-    page = browser.new_page()
     try:
+        browser = get_browser()
+        page = browser.new_page()
         page.goto(f'https://www.tiktok.com/@{username}', wait_until='networkidle', timeout=30000)
         content = page.content()
         page.close()
