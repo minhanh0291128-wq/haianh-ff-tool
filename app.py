@@ -3,8 +3,8 @@ import requests
 import os
 import json
 import re
-import asyncio
-from playwright.async_api import async_playwright
+import asyncio, threading
+from playwright.sync_api import sync_playwright
 
 # Ensure Playwright browsers path matches build.sh
 os.environ.setdefault('PLAYWRIGHT_BROWSERS_PATH', os.path.join(os.path.dirname(__file__), '.browsers'))
@@ -14,11 +14,11 @@ app = Flask(__name__)
 _pw = None
 _browser = None
 
-async def get_browser():
+def get_browser():
     global _pw, _browser
     if _browser is None:
-        _pw = await async_playwright().start()
-        _browser = await _pw.chromium.launch(
+        _pw = sync_playwright().start()
+        _browser = _pw.chromium.launch(
             headless=True,
             args=[
                 '--no-sandbox',
@@ -149,24 +149,13 @@ def api_set_name():
     save_names(names)
     return jsonify({'success': True, 'name': name})
 
-@app.route('/api/tiktok')
-def api_tiktok():
-    username = request.args.get('username', '').strip().replace('@', '')
-    if not username:
-        return jsonify({'error': 'Thiếu username'}), 400
-    try:
-        result = asyncio.run(_lookup_tiktok(username))
-        return result
-    except Exception as e:
-        return jsonify({'error': f'Lỗi kết nối TikTok: {str(e)[:100]}'}), 502
-
-async def _lookup_tiktok(username):
+def _do_lookup(username):
     page = None
     try:
-        browser = await get_browser()
-        page = await browser.new_page()
-        await page.goto(f'https://www.tiktok.com/@{username}', wait_until='networkidle', timeout=30000)
-        content = await page.content()
+        browser = get_browser()
+        page = browser.new_page()
+        page.goto(f'https://www.tiktok.com/@{username}', wait_until='networkidle', timeout=30000)
+        content = page.content()
         match = re.search(r'<script id="__UNIVERSAL_DATA_FOR_REHYDRATION__"[^>]*>([^<]+)</script>', content)
         if not match:
             return jsonify({'error': 'Không thể lấy dữ liệu TikTok'}), 502
@@ -195,8 +184,21 @@ async def _lookup_tiktok(username):
         return jsonify({'error': f'Lỗi kết nối TikTok: {str(e)[:100]}'}), 502
     finally:
         if page:
-            try: await page.close()
+            try: page.close()
             except: pass
+
+@app.route('/api/tiktok')
+def api_tiktok():
+    username = request.args.get('username', '').strip().replace('@', '')
+    if not username:
+        return jsonify({'error': 'Thiếu username'}), 400
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor() as pool:
+        future = pool.submit(_do_lookup, username)
+        try:
+            return future.result(timeout=65)
+        except Exception as e:
+            return jsonify({'error': f'Lỗi kết nối TikTok: {str(e)[:100]}'}), 502
 
 @app.route('/<path:filename>')
 def static_files(filename):
