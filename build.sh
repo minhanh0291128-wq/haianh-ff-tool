@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
+set -e
 pip install -r requirements.txt
-playwright install chromium --with-deps 2>&1 || playwright install chromium 2>&1
+python -m playwright install chromium 2>&1

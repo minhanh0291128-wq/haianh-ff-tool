@@ -164,7 +164,7 @@ def api_tiktok():
     except Exception as e:
         try: page.close()
         except: pass
-        return jsonify({'error': 'Lỗi kết nối TikTok'}), 502
+        return jsonify({'error': f'Lỗi kết nối TikTok: {str(e)[:100]}'}), 502
 
 @app.route('/<path:filename>')
 def static_files(filename):
