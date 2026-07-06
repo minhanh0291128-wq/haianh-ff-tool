@@ -145,10 +145,17 @@ def api_set_name():
     return jsonify({'success': True, 'name': name})
 
 @app.route('/api/tiktok')
-async def api_tiktok():
+def api_tiktok():
     username = request.args.get('username', '').strip().replace('@', '')
     if not username:
         return jsonify({'error': 'Thiếu username'}), 400
+    try:
+        result = asyncio.run(_lookup_tiktok(username))
+        return result
+    except Exception as e:
+        return jsonify({'error': f'Lỗi kết nối TikTok: {str(e)[:100]}'}), 502
+
+async def _lookup_tiktok(username):
     page = None
     try:
         browser = await get_browser()
