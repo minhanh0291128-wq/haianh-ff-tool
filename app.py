@@ -136,12 +136,12 @@ def api_tiktok():
     username = request.args.get('username', '').strip().replace('@', '')
     if not username:
         return jsonify({'error': 'Thiếu username'}), 400
+    page = None
     try:
         browser = get_browser()
         page = browser.new_page()
         page.goto(f'https://www.tiktok.com/@{username}', wait_until='networkidle', timeout=30000)
         content = page.content()
-        page.close()
         match = re.search(r'<script id="__UNIVERSAL_DATA_FOR_REHYDRATION__"[^>]*>([^<]+)</script>', content)
         if not match:
             return jsonify({'error': 'Không thể lấy dữ liệu TikTok'}), 502
@@ -167,9 +167,11 @@ def api_tiktok():
             'videos': stats.get('videoCount', 0)
         })
     except Exception as e:
-        try: page.close()
-        except: pass
         return jsonify({'error': f'Lỗi kết nối TikTok: {str(e)[:100]}'}), 502
+    finally:
+        if page:
+            try: page.close()
+            except: pass
 
 @app.route('/<path:filename>')
 def static_files(filename):
