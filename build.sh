@@ -9,7 +9,6 @@ apt-get update -qq && apt-get install -y -qq --no-install-recommends \
 
 pip install -q -r requirements.txt
 
-# Install Playwright Chromium into the project directory to survive build→runtime transition
+# Install Playwright Chromium into the project directory (persists to runtime)
 export PLAYWRIGHT_BROWSERS_PATH="$(pwd)/.browsers"
 python -m playwright install chromium 2>&1
-echo "export PLAYWRIGHT_BROWSERS_PATH=$(pwd)/.browsers" >> /opt/render/project/.env 2>/dev/null || true

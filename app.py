@@ -6,6 +6,9 @@ import re
 import asyncio
 from playwright.async_api import async_playwright
 
+# Ensure Playwright browsers path matches build.sh
+os.environ.setdefault('PLAYWRIGHT_BROWSERS_PATH', os.path.join(os.path.dirname(__file__), '.browsers'))
+
 app = Flask(__name__)
 
 _pw = None
