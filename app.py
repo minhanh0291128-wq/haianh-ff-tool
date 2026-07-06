@@ -50,16 +50,16 @@ class TikTokWorker(threading.Thread):
             content = page.content()
             match = re.search(r'<script id="__UNIVERSAL_DATA_FOR_REHYDRATION__"[^>]*>([^<]+)</script>', content)
             if not match:
-                return jsonify({'error': 'Không thể lấy dữ liệu TikTok'}), 502
+                return ({'error': 'Không thể lấy dữ liệu TikTok'}, 502)
             data = json.loads(match.group(1))
             scope = data.get('__DEFAULT_SCOPE__', {})
             user_detail = scope.get('webapp.user-detail', {})
             if not user_detail or 'userInfo' not in user_detail:
-                return jsonify({'error': 'Không tìm thấy user'}), 404
+                return ({'error': 'Không tìm thấy user'}, 404)
             info = user_detail['userInfo']
             user = info.get('user', {})
             stats = info.get('stats', {})
-            return jsonify({
+            return ({
                 'nickname': user.get('nickname', ''),
                 'username': user.get('uniqueId', username),
                 'avatar': user.get('avatarMedium', ''),
@@ -71,9 +71,9 @@ class TikTokWorker(threading.Thread):
                 'following': stats.get('followingCount', 0),
                 'hearts': stats.get('heartCount', 0),
                 'videos': stats.get('videoCount', 0)
-            })
+            }, 200)
         except Exception as e:
-            return jsonify({'error': f'Lỗi kết nối TikTok: {str(e)[:100]}'}), 502
+            return ({'error': f'Lỗi kết nối TikTok: {str(e)[:100]}'}, 502)
         finally:
             if page:
                 try: page.close()
@@ -198,7 +198,8 @@ def api_tiktok():
     if not username:
         return jsonify({'error': 'Thiếu username'}), 400
     try:
-        return _tiktok_worker.lookup(username, timeout=65)
+        data, status = _tiktok_worker.lookup(username, timeout=65)
+        return jsonify(data), status
     except queue.Empty:
         return jsonify({'error': 'Lỗi kết nối TikTok: timeout'}), 502
     except Exception as e:
