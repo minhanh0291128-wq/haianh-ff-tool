@@ -3,12 +3,29 @@ import requests
 import os
 import json
 import re
-import subprocess
-import sys
+from playwright.async_api import async_playwright
 
 os.environ.setdefault('PLAYWRIGHT_BROWSERS_PATH', os.path.join(os.path.dirname(__file__), '.browsers'))
 
 app = Flask(__name__)
+
+_pw = None
+_browser = None
+
+async def get_browser():
+    global _pw, _browser
+    if _browser is None:
+        _pw = await async_playwright().start()
+        _browser = await _pw.chromium.launch(
+            headless=True,
+            args=[
+                '--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage',
+                '--disable-setuid-sandbox', '--no-first-run', '--disable-extensions',
+                '--disable-background-networking', '--disable-sync', '--mute-audio',
+                '--js-flags=--max_old_space_size=256',
+            ]
+        )
+    return _browser
 
 @app.after_request
 def add_common_headers(resp):
@@ -117,27 +134,46 @@ def api_set_name():
     return jsonify({'success': True, 'name': name})
 
 @app.route('/api/tiktok')
-def api_tiktok():
+async def api_tiktok():
     username = request.args.get('username', '').strip().replace('@', '')
     if not username:
         return jsonify({'error': 'Thiếu username'}), 400
-    script = os.path.join(os.path.dirname(__file__), 'tiktok_scraper.py')
+    page = None
     try:
-        result = subprocess.run(
-            [sys.executable, script, username],
-            capture_output=True, text=True, timeout=65,
-            env={**os.environ, 'PLAYWRIGHT_BROWSERS_PATH': os.path.join(os.path.dirname(__file__), '.browsers')}
-        )
-        if result.returncode != 0:
-            return jsonify({'error': f'Lỗi kết nối TikTok: {result.stderr.strip()[:100]}'}), 502
-        data = json.loads(result.stdout)
-        return jsonify(data)
-    except subprocess.TimeoutExpired:
-        return jsonify({'error': 'Lỗi kết nối TikTok: timeout'}), 502
-    except json.JSONDecodeError:
-        return jsonify({'error': 'Lỗi kết nối TikTok: response parse error'}), 502
+        browser = await get_browser()
+        page = await browser.new_page()
+        await page.goto(f'https://www.tiktok.com/@{username}', wait_until='networkidle', timeout=30000)
+        content = await page.content()
+        match = re.search(r'<script id="__UNIVERSAL_DATA_FOR_REHYDRATION__"[^>]*>([^<]+)</script>', content)
+        if not match:
+            return jsonify({'error': 'Không thể lấy dữ liệu TikTok'}), 502
+        data = json.loads(match.group(1))
+        scope = data.get('__DEFAULT_SCOPE__', {})
+        user_detail = scope.get('webapp.user-detail', {})
+        if not user_detail or 'userInfo' not in user_detail:
+            return jsonify({'error': 'Không tìm thấy user'}), 404
+        info = user_detail['userInfo']
+        user = info.get('user', {})
+        stats = info.get('stats', {})
+        return jsonify({
+            'nickname': user.get('nickname', ''),
+            'username': user.get('uniqueId', username),
+            'avatar': user.get('avatarMedium', ''),
+            'signature': user.get('signature', ''),
+            'verified': user.get('verified', False),
+            'private': user.get('privateAccount', False),
+            'createdAt': user.get('createTime', 0),
+            'followers': stats.get('followerCount', 0),
+            'following': stats.get('followingCount', 0),
+            'hearts': stats.get('heartCount', 0),
+            'videos': stats.get('videoCount', 0)
+        })
     except Exception as e:
         return jsonify({'error': f'Lỗi kết nối TikTok: {str(e)[:100]}'}), 502
+    finally:
+        if page:
+            try: await page.close()
+            except: pass
 
 @app.route('/<path:filename>')
 def static_files(filename):
