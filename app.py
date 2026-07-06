@@ -84,8 +84,13 @@ def api_lookup():
         tried_regions.add(region)
         url = f'{API_BASE}/info?region={region}&uid={uid}&key={API_KEY}'
         try:
-            resp = requests.get(url, timeout=10, headers={'User-Agent': 'Mozilla/5.0'})
+            resp = requests.get(url, timeout=10, headers={'User-Agent': 'HaianhFFTool/1.0 (+https://haianh-ff-tool.onrender.com)'})
             if resp.status_code != 200:
+                try:
+                    err = resp.json()
+                    if 'QUOTA' in err.get('code', ''):
+                        return jsonify({'error': 'API Free Fire đã hết lượt trong tháng. Sẽ reset vào 1/8/2026.'}), 429
+                except: pass
                 continue
             try:
                 data = resp.json()
